@@ -24,6 +24,7 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.icons.FlatAnimatedIcon;
+import com.paula.checkmycar.desktop.controller.CitasOpenMenuController;
 import com.paula.checkmycar.desktop.controller.ClienteOpenMenuController;
 import com.paula.checkmycar.desktop.controller.CocheOpenMenuController;
 import com.paula.checkmycar.desktop.controller.EmpleadoOpenMenuController;
@@ -32,6 +33,9 @@ import com.paula.checkmycar.desktop.controller.OpenLoginController;
 import com.paula.checkmycar.desktop.controller.PresupuestoOpenMenuController;
 import com.paula.checkmycar.desktop.views.View;
 
+/*
+ * Ventana principal de la aplicación 
+ */
 public class CheckmycarWindow {
 
 	private static CheckmycarWindow instance = null;
@@ -47,6 +51,7 @@ public class CheckmycarWindow {
 	private JButton presupuestoButton;
 	private JButton inicioButton;
 	private JButton loginButton;
+	private JButton citaButton;
 
 	/**
 	 * Launch the application.
@@ -195,6 +200,13 @@ public class CheckmycarWindow {
 		menuPanel.add(rigidArea_1);
 		menuPanel.add(presupuestoButton);
 		menuPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		
+		citaButton = new JButton("citas ");
+		citaButton.setMaximumSize(new Dimension(150, 30));
+		citaButton.setIcon(new ImageIcon(CheckmycarWindow.class.getResource("/nuvola/16x16/1529_gaming_gaming_game_blue_controller_folder_game_games_blue_controller_folder_games.png")));
+		citaButton.setHorizontalAlignment(SwingConstants.LEFT);
+		citaButton.setAlignmentX(0.0f);
+		menuPanel.add(citaButton);
 
 		JPanel eastPanel = new JPanel();
 		mainPanel.add(eastPanel, BorderLayout.EAST);
@@ -265,6 +277,7 @@ public class CheckmycarWindow {
 		empleadoButton.addActionListener(new EmpleadoOpenMenuController(empleadoButton));
 		inicioButton.addActionListener(new OpenHomeViewController());
 		loginButton.addActionListener(new OpenLoginController());
+		citaButton.addActionListener(new CitasOpenMenuController(citaButton));
 	}
 
 }
