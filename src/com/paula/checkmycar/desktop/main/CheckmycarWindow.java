@@ -22,14 +22,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.icons.FlatAnimatedIcon;
 import com.paula.checkmycar.desktop.controller.CitasOpenMenuController;
 import com.paula.checkmycar.desktop.controller.ClienteOpenMenuController;
 import com.paula.checkmycar.desktop.controller.CocheOpenMenuController;
 import com.paula.checkmycar.desktop.controller.EmpleadoOpenMenuController;
 import com.paula.checkmycar.desktop.controller.OpenHomeViewController;
 import com.paula.checkmycar.desktop.controller.OpenLoginController;
+import com.paula.checkmycar.desktop.controller.PiezaOpenMenuController;
 import com.paula.checkmycar.desktop.controller.PresupuestoOpenMenuController;
 import com.paula.checkmycar.desktop.views.View;
 
@@ -52,6 +51,7 @@ public class CheckmycarWindow {
 	private JButton inicioButton;
 	private JButton loginButton;
 	private JButton citaButton;
+	private JButton piezaButton;
 
 	/**
 	 * Launch the application.
@@ -131,6 +131,14 @@ public class CheckmycarWindow {
 		gbc_inicioButton.gridx = 0;
 		gbc_inicioButton.gridy = 0;
 		northPanel.add(inicioButton, gbc_inicioButton);
+		
+		piezaButton = new JButton("");
+		piezaButton.setIcon(new ImageIcon(CheckmycarWindow.class.getResource("/icons/32x32/mantenimiento.png")));
+		GridBagConstraints gbc_piezaButton = new GridBagConstraints();
+		gbc_piezaButton.insets = new Insets(0, 0, 0, 5);
+		gbc_piezaButton.gridx = 2;
+		gbc_piezaButton.gridy = 0;
+		northPanel.add(piezaButton, gbc_piezaButton);
 
 		loginButton = new JButton("");
 		loginButton.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -278,6 +286,9 @@ public class CheckmycarWindow {
 		inicioButton.addActionListener(new OpenHomeViewController());
 		loginButton.addActionListener(new OpenLoginController());
 		citaButton.addActionListener(new CitasOpenMenuController(citaButton));
+		piezaButton.addActionListener(new PiezaOpenMenuController(piezaButton));
+		
+		addView("Inicio", new com.paula.checkmycar.desktop.views.HomeView());
 	}
 
 }
