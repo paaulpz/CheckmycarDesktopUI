@@ -21,8 +21,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import com.paula.checkmc.dao.ClienteDAO;
+import com.paula.checkmc.dao.EmpleadoDAO;
+import com.paula.checkmc.dao.RolDAO;
+import com.paula.checkmc.model.Rol;
 import com.paula.checkmc.service.MailService;
 import com.paula.checkmc.service.impl.MailServiceApacheImpl;
+import com.paula.checkmycar.desktop.views.renderer.RolCBRenderer;
 
 public class LoginWindow {
 
@@ -32,8 +37,7 @@ public class LoginWindow {
 
     private JRadioButton clienteRadio;
     private JRadioButton empleadoRadio;
-    private JComboBox<String> rolCombo;
-
+    private JComboBox<Rol> rolCombo;
     public LoginWindow() {
         initialize();
     }
@@ -45,7 +49,7 @@ public class LoginWindow {
         frame = new JFrame("CheckMyCar - Login");
         frame.setSize(350, 350);
         frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout());
 
         JLabel title = new JLabel("CheckMyCar", SwingConstants.CENTER);
@@ -98,16 +102,16 @@ public class LoginWindow {
      
         gbc.gridx = 0; gbc.gridy = 3;
         panel.add(new JLabel("Rol:"), gbc);
+        rolCombo = new JComboBox<Rol>();
 
-        rolCombo = new JComboBox<>(new String[]{
-                "Seleccionar",
-                "Administrador",
-                "Mecánico",
-                "Comercial",
-                "Pintor",
-                "Chapista"
-        });
+        rolCombo.setRenderer(new RolCBRenderer());
 
+        RolDAO rolDAO = new RolDAO();
+
+        for (Rol r : rolDAO.findAll()) {
+            rolCombo.addItem(r);
+        }
+        
         rolCombo.setVisible(false);
 
         gbc.gridx = 1;
@@ -154,42 +158,95 @@ public class LoginWindow {
         String pass = new String(passwordField.getPassword()).trim();
 
         if (dni.isEmpty() || pass.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Rellena todos los campos");
+
+            JOptionPane.showMessageDialog(frame,
+                    "Rellena todos los campos");
+
             return;
         }
 
         if (clienteRadio.isSelected()) {
-            if (dni.equals("12345678A") && pass.equals("1234")) {
-                entrar();
-            } else {
-                error();
-            }
-            return;
-        }
 
-        if (empleadoRadio.isSelected()) {
+            ClienteDAO dao = new ClienteDAO();
 
-            String rol = (String) rolCombo.getSelectedItem();
+            if (!dao.existeDni(dni)) {
 
-            if ("Seleccionar".equals(rol)) {
-                JOptionPane.showMessageDialog(frame, "Selecciona un rol");
+                JOptionPane.showMessageDialog(frame,
+                        "DNI inexistente");
+
                 return;
             }
 
-            boolean acceso =
-                    (rol.equals("Administrador") && dni.equals("admin") && pass.equals("1234")) ||
-                    (rol.equals("Mecánico") && dni.equals("mecanico") && pass.equals("1234"));
+            if (!dao.login(dni, pass)) {
 
-            if (acceso) entrar();
-            else error();
+                JOptionPane.showMessageDialog(frame,
+                        "Contraseña incorrecta");
+
+                return;
+            }
+
+            entrar();
+        }
+
+        else if (empleadoRadio.isSelected()) {
+
+            Rol rol = (Rol) rolCombo.getSelectedItem();
+
+            if (rol == null || rol.getId() == null) {
+
+                JOptionPane.showMessageDialog(frame,
+                        "Selecciona un rol");
+
+                return;
+            }
+
+            EmpleadoDAO dao = new EmpleadoDAO();
+
+            if (!dao.existeDni(dni)) {
+
+                JOptionPane.showMessageDialog(frame,
+                        "DNI inexistente");
+
+                return;
+            }
+
+            if (!dao.login(dni, pass, rol.getId())) {
+
+                JOptionPane.showMessageDialog(frame,
+                        "Contraseña incorrecta");
+
+                return;
+            }
+
+            entrar();
         }
     }
-
+    
+  
     private void recuperarPassword() {
 
-        String email = JOptionPane.showInputDialog(frame, "Introduce tu email:");
+        String email =
+                JOptionPane.showInputDialog(frame,
+                        "Introduce tu email:");
 
-        if (email == null || email.trim().isEmpty()) return;
+        if (email == null || email.trim().isEmpty()) {
+            return;
+        }
+
+        ClienteDAO clienteDAO = new ClienteDAO();
+        EmpleadoDAO empleadoDAO = new EmpleadoDAO();
+
+        boolean existe =
+                clienteDAO.existeCorreo(email)
+                || empleadoDAO.existeCorreo(email);
+
+        if (!existe) {
+
+            JOptionPane.showMessageDialog(frame,
+                    "Correo incorrecto");
+
+            return;
+        }
 
         cambiarPassword(email);
     }
