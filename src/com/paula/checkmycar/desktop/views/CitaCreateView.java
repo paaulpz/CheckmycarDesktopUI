@@ -6,8 +6,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.time.ZoneId;
+import java.util.Date;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -16,8 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import com.paula.checkmc.model.Cita;
 import com.paula.checkmc.model.CitaDTO;
@@ -36,88 +34,185 @@ import com.paula.checkmc.service.impl.EstadoCitaServiceImpl;
 import com.paula.checkmycar.desktop.controller.CitaCreateController;
 import com.paula.checkmycar.desktop.controller.CitaSetEditableController;
 import com.paula.checkmycar.desktop.controller.Controller;
-import com.paula.checkmycar.desktop.views.renderer.ClienteCBRenderer;
+import com.toedter.calendar.JDateChooser;
 
 public class CitaCreateView extends View {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
+    private JDateChooser dateChooser;
     private JTextField descripcionTF;
-    private JTextField fechaTF;
-
-    private JComboBox<ClienteDTO>  clienteCB;
-    private JComboBox<CocheDTO>    cocheCB;
-    private JComboBox<EstadoCita>  estadoCB;
+    private JComboBox<ClienteDTO> clienteCB;
+    private JComboBox<CocheDTO> cocheCB;
+    private JComboBox<EstadoCita> estadoCB;
 
     private JButton guardarButton;
-    private JButton limpiarButton;
+    private JButton cancelarButton;
 
     private Long citaId;
 
-    private ClienteService    clienteService    = new ClienteServiceImpl();
-    private CocheService      cocheService      = new CocheServiceImpl();
-    private EstadoCitaService estadoCitaService = new EstadoCitaServiceImpl();
+    private ClienteService clienteService = new ClienteServiceImpl();
+    private CocheService cocheService = new CocheServiceImpl();
+    private EstadoCitaService estadoService = new EstadoCitaServiceImpl();
 
     public CitaCreateView() {
-        initialize();
+        initComponents();
         postInitialize();
     }
 
-    private void initialize() {
+    private void initComponents() {
         setName("Crear cita");
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(0, 0));
 
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        add(formPanel, BorderLayout.NORTH);
+        JPanel contentPanel = new JPanel();
+        add(contentPanel, BorderLayout.CENTER);
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(5, 5, 5, 5);
-        c.fill = GridBagConstraints.HORIZONTAL;
+        GridBagLayout gbl = new GridBagLayout();
+        gbl.columnWidths = new int[]{0, 200, 0, 200, 0};
+        gbl.rowHeights = new int[]{0, 0, 0, 0, 0};
+        gbl.columnWeights = new double[]{0.0, 1.0, 0.0, 1.0, Double.MIN_VALUE};
+        gbl.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        contentPanel.setLayout(gbl);
 
-        int y = 0;
+        // Fila 0: Fecha / Estado
+        JLabel fechaLabel = new JLabel("Fecha *:");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 5, 5);
+        gbc.gridx = 0; gbc.gridy = 0;
+        contentPanel.add(fechaLabel, gbc);
 
-        c.gridx = 0; c.gridy = y; formPanel.add(new JLabel("Fecha (dd/MM/yyyy HH:mm) *:"), c);
-        fechaTF = new JTextField();
-        c.gridx = 1; formPanel.add(fechaTF, c);
+        dateChooser = new JDateChooser();
+        dateChooser.setDateFormatString("dd/MM/yyyy");
+        gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 0, 5, 10);
+        gbc.gridx = 1; gbc.gridy = 0;
+        contentPanel.add(dateChooser, gbc);
 
-        c.gridx = 2; formPanel.add(new JLabel("Estado *:"), c);
+        JLabel estadoLabel = new JLabel("Estado *:");
+        gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 5, 5);
+        gbc.gridx = 2; gbc.gridy = 0;
+        contentPanel.add(estadoLabel, gbc);
+
         estadoCB = new JComboBox<>();
-        c.gridx = 3; formPanel.add(estadoCB, c);
+        gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 0, 5, 10);
+        gbc.gridx = 3; gbc.gridy = 0;
+        contentPanel.add(estadoCB, gbc);
 
-        y++;
-        c.gridx = 0; c.gridy = y; formPanel.add(new JLabel("Cliente *:"), c);
+        // Fila 1: Cliente / Coche
+        JLabel clienteLabel = new JLabel("Cliente (DNI) *:");
+        gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 10, 5, 5);
+        gbc.gridx = 0; gbc.gridy = 1;
+        contentPanel.add(clienteLabel, gbc);
+
         clienteCB = new JComboBox<>();
-        c.gridx = 1; formPanel.add(clienteCB, c);
+        gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 0, 5, 10);
+        gbc.gridx = 1; gbc.gridy = 1;
+        contentPanel.add(clienteCB, gbc);
 
-        c.gridx = 2; formPanel.add(new JLabel("Coche *:"), c);
+        JLabel cocheLabel = new JLabel("Coche (Matrícula) *:");
+        gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 10, 5, 5);
+        gbc.gridx = 2; gbc.gridy = 1;
+        contentPanel.add(cocheLabel, gbc);
+
         cocheCB = new JComboBox<>();
-        c.gridx = 3; formPanel.add(cocheCB, c);
+        gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 0, 5, 10);
+        gbc.gridx = 3; gbc.gridy = 1;
+        contentPanel.add(cocheCB, gbc);
 
-        y++;
-        c.gridx = 0; c.gridy = y; formPanel.add(new JLabel("Descripción:"), c);
+        // Fila 2: Descripción
+        JLabel descLabel = new JLabel("Descripción:");
+        gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 10, 10, 5);
+        gbc.gridx = 0; gbc.gridy = 2;
+        contentPanel.add(descLabel, gbc);
+
         descripcionTF = new JTextField();
-        c.gridx = 1; c.gridwidth = 3; formPanel.add(descripcionTF, c);
-        c.gridwidth = 1;
+        gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 0, 10, 10);
+        gbc.gridwidth = 3;
+        gbc.gridx = 1; gbc.gridy = 2;
+        contentPanel.add(descripcionTF, gbc);
 
-        JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        add(botonesPanel, BorderLayout.SOUTH);
+        // Botones
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        add(buttonsPanel, BorderLayout.SOUTH);
 
-        limpiarButton = new JButton("Limpiar");
         guardarButton = new JButton("Guardar");
+        cancelarButton = new JButton("Cancelar");
 
-        botonesPanel.add(limpiarButton);
-        botonesPanel.add(guardarButton);
+        buttonsPanel.add(cancelarButton);
+        buttonsPanel.add(guardarButton);
 
-        limpiarButton.addActionListener(e -> limpiar());
-        guardarButton.addActionListener(e -> new CitaCreateController(this).doAction());
+        guardarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                new CitaCreateController(CitaCreateView.this).doAction();
+            }
+        });
 
-        clienteCB.addActionListener(e -> cargarCoches());
+        // Al cambiar cliente carga sus coches
+        clienteCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                cargarCoches();
+            }
+        });
     }
 
     private void postInitialize() {
 
-        clienteCB.setRenderer(new ClienteCBRenderer());
+        // Renderer cliente — muestra DNI
+        clienteCB.setRenderer(new javax.swing.DefaultListCellRenderer() {
+            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list,
+                    Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ClienteDTO) {
+                    ClienteDTO c = (ClienteDTO) value;
+                    setText(c.getId() == null ? "Seleccionar" : c.getDniNie() + " - " + c.getNombre());
+                }
+                return this;
+            }
+        });
 
+        // Renderer coche — muestra matrícula
+        cocheCB.setRenderer(new javax.swing.DefaultListCellRenderer() {
+            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list,
+                    Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof CocheDTO) {
+                    CocheDTO co = (CocheDTO) value;
+                    setText(co.getId() == null ? "Seleccionar" : co.getMatricula());
+                }
+                return this;
+            }
+        });
+
+        // Renderer estado
+        estadoCB.setRenderer(new javax.swing.DefaultListCellRenderer() {
+            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list,
+                    Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof EstadoCita) {
+                    EstadoCita est = (EstadoCita) value;
+                    setText(est.getId() == null ? "Seleccionar" : est.getNombre());
+                }
+                return this;
+            }
+        });
+
+        // Cargar clientes
         Results<ClienteDTO> clientes = clienteService.findByCriteria(new ClienteCriteria(), 1, 1000);
         DefaultComboBoxModel<ClienteDTO> clienteModel = new DefaultComboBoxModel<>();
         ClienteDTO clientePlaceholder = new ClienteDTO();
@@ -126,8 +221,8 @@ public class CitaCreateView extends View {
         clienteModel.addElement(clientePlaceholder);
         for (ClienteDTO cl : clientes.getPage()) clienteModel.addElement(cl);
         clienteCB.setModel(clienteModel);
-        AutoCompleteDecorator.decorate(clienteCB);
 
+        // Placeholder coche
         DefaultComboBoxModel<CocheDTO> cocheModel = new DefaultComboBoxModel<>();
         CocheDTO cochePlaceholder = new CocheDTO();
         cochePlaceholder.setId(null);
@@ -135,33 +230,14 @@ public class CitaCreateView extends View {
         cocheModel.addElement(cochePlaceholder);
         cocheCB.setModel(cocheModel);
 
+        // Cargar estados
         DefaultComboBoxModel<EstadoCita> estadoModel = new DefaultComboBoxModel<>();
         EstadoCita estadoPlaceholder = new EstadoCita();
         estadoPlaceholder.setId(null);
         estadoPlaceholder.setNombre("Seleccionar");
         estadoModel.addElement(estadoPlaceholder);
-        for (EstadoCita e : estadoCitaService.findAll()) estadoModel.addElement(e);
+        for (EstadoCita est : estadoService.findAll()) estadoModel.addElement(est);
         estadoCB.setModel(estadoModel);
-        estadoCB.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
-            javax.swing.JLabel label = new javax.swing.JLabel();
-            if (value instanceof EstadoCita) label.setText(((EstadoCita) value).getNombre());
-            if (isSelected) { label.setBackground(list.getSelectionBackground()); label.setOpaque(true); }
-            return label;
-        });
-        
-        cocheCB.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
-            javax.swing.JLabel label = new javax.swing.JLabel();
-            if (value instanceof CocheDTO) {
-                CocheDTO co = (CocheDTO) value;
-                String texto = co.getId() == null ? "Seleccionar" : co.getMatricula();
-                label.setText(texto);
-            }
-            if (isSelected) {
-                label.setBackground(list.getSelectionBackground());
-                label.setOpaque(true);
-            }
-            return label;
-        });
     }
 
     private void cargarCoches() {
@@ -179,35 +255,11 @@ public class CitaCreateView extends View {
             for (CocheDTO coche : coches.getPage()) model.addElement(coche);
         }
         cocheCB.setModel(model);
-        cocheCB.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
-            javax.swing.JLabel label = new javax.swing.JLabel();
-            if (value instanceof CocheDTO) label.setText(((CocheDTO) value).getMatricula());
-            if (isSelected) { label.setBackground(list.getSelectionBackground()); label.setOpaque(true); }
-            return label;
-        });
-    }
-
-    private void limpiar() {
-        fechaTF.setText("");
-        descripcionTF.setText("");
-        clienteCB.setSelectedIndex(0);
-        estadoCB.setSelectedIndex(0);
-        citaId = null;
     }
 
     public Cita getModel() {
-
-        String fechaStr = fechaTF.getText().trim();
-        if (fechaStr.isEmpty()) {
+        if (dateChooser.getDate() == null) {
             JOptionPane.showMessageDialog(this, "La fecha es obligatoria.", "Error", JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
-
-        LocalDateTime fecha;
-        try {
-            fecha = LocalDateTime.parse(fechaStr, FORMATTER);
-        } catch (DateTimeParseException e) {
-            JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Usa dd/MM/yyyy HH:mm", "Error", JOptionPane.ERROR_MESSAGE);
             return null;
         }
 
@@ -229,6 +281,9 @@ public class CitaCreateView extends View {
             return null;
         }
 
+        Date date = dateChooser.getDate();
+        LocalDateTime fecha = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
         Cita cita = new Cita();
         cita.setId(citaId);
         cita.setFecha(fecha);
@@ -241,7 +296,7 @@ public class CitaCreateView extends View {
     }
 
     public void setEditable(boolean editable) {
-        fechaTF.setEditable(editable);
+        dateChooser.setEnabled(editable);
         descripcionTF.setEditable(editable);
         clienteCB.setEnabled(editable);
         cocheCB.setEnabled(editable);
@@ -252,10 +307,18 @@ public class CitaCreateView extends View {
         guardarButton.setAction(controller);
     }
 
+    public void setCancelController(Controller controller) {
+        cancelarButton.setAction(controller);
+    }
+
     public void setCitaDTO(CitaDTO cita) {
         this.citaId = cita.getId();
 
-        fechaTF.setText(cita.getFecha() != null ? cita.getFecha().format(FORMATTER) : "");
+        if (cita.getFecha() != null) {
+            Date date = Date.from(cita.getFecha().atZone(ZoneId.systemDefault()).toInstant());
+            dateChooser.setDate(date);
+        }
+
         descripcionTF.setText(cita.getDescripcion() != null ? cita.getDescripcion() : "");
 
         for (int i = 0; i < clienteCB.getItemCount(); i++) {
@@ -275,8 +338,8 @@ public class CitaCreateView extends View {
         }
 
         for (int i = 0; i < estadoCB.getItemCount(); i++) {
-            EstadoCita e = estadoCB.getItemAt(i);
-            if (e.getId() != null && e.getId().equals(cita.getEstadoCitaId())) {
+            EstadoCita est = estadoCB.getItemAt(i);
+            if (est.getId() != null && est.getId().equals(cita.getEstadoCitaId())) {
                 estadoCB.setSelectedIndex(i);
                 break;
             }

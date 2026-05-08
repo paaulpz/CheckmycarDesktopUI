@@ -19,13 +19,10 @@ public class CitasOpenMenuController extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem verItem = new JMenuItem("Ver citas");
-        verItem.addActionListener(new CitaOpenSearchController());
 
-        JMenuItem nuevaItem = new JMenuItem("Nueva cita");
+        JMenuItem nuevaItem = new JMenuItem("Nueva ");
         nuevaItem.addActionListener(new CitaOpenCreateController());
 
-        menu.add(verItem);
         menu.add(nuevaItem);
 
         menu.show(parent, 0, parent.getHeight());

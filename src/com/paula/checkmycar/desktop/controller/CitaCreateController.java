@@ -24,12 +24,20 @@ public class CitaCreateController extends Controller {
         if (cita == null) return;
 
         try {
+            if (citaService.existeCitaEnFecha(cita.getFecha())) {
+                int opcion = JOptionPane.showConfirmDialog(view,
+                    "Ya existe una cita en esa fecha ",
+                    "Aviso",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+                if (opcion != JOptionPane.YES_OPTION) return;
+            }
             citaService.create(cita);
             JOptionPane.showMessageDialog(view, "Cita guardada correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(view, "Error al guardar la cita: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
+    }	
 
     @Override
     public void actionPerformed(ActionEvent e) {
