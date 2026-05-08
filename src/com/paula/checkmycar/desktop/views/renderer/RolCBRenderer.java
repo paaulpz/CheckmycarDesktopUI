@@ -7,9 +7,9 @@ import javax.swing.JList;
 
 import com.paula.checkmc.model.Rol;
 
-public class RolCBRender  extends DefaultListCellRenderer{
+public class RolCBRenderer  extends DefaultListCellRenderer{
 	
-	public RolCBRender() {
+	public RolCBRenderer() {
 	}
 	public Component getListCellRendererComponent(JList<?> list,Object value, int index,boolean isSelected, boolean cellHasFocus) {
 		 setText(value == null ? "" : ((Rol) value).getNombre());

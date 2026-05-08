@@ -2,6 +2,7 @@ package com.paula.checkmycar.desktop.views;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -9,8 +10,10 @@ import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -23,6 +26,7 @@ import com.paula.checkmc.model.Rol;
 import com.paula.checkmc.service.RolService;
 import com.paula.checkmc.service.impl.RolServiceImpl;
 import com.paula.checkmycar.desktop.controller.EmpleadoSearchController;
+import com.paula.checkmycar.desktop.views.renderer.ButtonRenderer;
 import com.paula.checkmycar.desktop.views.tableModel.EmpleadoTableModel;
 
 public class EmpleadoSearchView extends View {
@@ -39,6 +43,12 @@ public class EmpleadoSearchView extends View {
     private EmpleadoTableModel tableModel;
 
     private RolService rolService;
+    
+    private JButton anteriorButton;
+    private JButton siguienteButton;
+    private JLabel paginaLabel;
+    private int paginaActual = 1;
+    private EmpleadoSearchController searchController;
 
     public EmpleadoSearchView() {
         setName("Búsqueda de empleados");
@@ -128,6 +138,7 @@ public class EmpleadoSearchView extends View {
         criteriosPanel.add(emailTF, gbc_emailTF);
 
         limpiarButton = new JButton("Limpiar");
+        limpiarButton.setIcon(new ImageIcon(EmpleadoSearchView.class.getResource("/icons/16x16/basura.png")));
         GridBagConstraints gbc_limpiarButton = new GridBagConstraints();
         gbc_limpiarButton.insets = new Insets(5, 5, 10, 5);
         gbc_limpiarButton.gridx = 6;
@@ -135,6 +146,7 @@ public class EmpleadoSearchView extends View {
         criteriosPanel.add(limpiarButton, gbc_limpiarButton);
 
         buscarButton = new JButton("Buscar");
+        buscarButton.setIcon(new ImageIcon(EmpleadoSearchView.class.getResource("/nuvola/16x16/1339_kmag_kmag.png")));
         GridBagConstraints gbc_buscarButton = new GridBagConstraints();
         gbc_buscarButton.insets = new Insets(5, 0, 10, 10);
         gbc_buscarButton.gridx = 7;
@@ -151,6 +163,21 @@ public class EmpleadoSearchView extends View {
         resultadosPanel.add(new JScrollPane(tabla), BorderLayout.CENTER);
 
         limpiarButton.addActionListener(e -> clearFields());
+        
+        
+        JPanel paginacionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        add(paginacionPanel, BorderLayout.SOUTH);
+
+        anteriorButton = new JButton("◀ Anterior");
+        paginaLabel = new JLabel("Página 1");
+        siguienteButton = new JButton("Siguiente ▶");
+
+        paginacionPanel.add(anteriorButton);
+        paginacionPanel.add(paginaLabel);
+        paginacionPanel.add(siguienteButton);
+
+        anteriorButton.setEnabled(false);
+        siguienteButton.setEnabled(false);
     }
 
     private void postInitialize() {
@@ -158,9 +185,7 @@ public class EmpleadoSearchView extends View {
         Rol placeholder = new Rol();
         placeholder.setNombre("Todos");
         rolModel.addElement(placeholder);
-        for (Rol r : rolService.findAll()) {
-            rolModel.addElement(r);
-        }
+        for (Rol r : rolService.findAll()) rolModel.addElement(r);
         rolComboBox.setModel(rolModel);
 
         rolComboBox.setRenderer(new DefaultListCellRenderer() {
@@ -168,16 +193,58 @@ public class EmpleadoSearchView extends View {
             public Component getListCellRendererComponent(JList<?> list, Object value,
                     int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Rol) {
-                    setText(((Rol) value).getNombre());
-                }
+                if (value instanceof Rol) setText(((Rol) value).getNombre());
                 return this;
             }
         });
 
-        buscarButton.addActionListener(new EmpleadoSearchController(this));
+        buscarButton.addActionListener(e -> searchController.buscar(1));
+
+        tabla.getColumn("Editar").setCellRenderer(new ButtonRenderer());
+
+        tabla.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int col = tabla.columnAtPoint(e.getPoint());
+                int row = tabla.rowAtPoint(e.getPoint());
+                if (col == tabla.getColumnModel().getColumnIndex("Editar") && row >= 0) {
+                    EmpleadoDTO empleado = tableModel.getEmpleados().get(row);
+                    try {
+                        EmpleadoCreateView view = new EmpleadoCreateView();
+                        view.setEmpleadoDTO(empleado);
+                        view.setEditable(false);
+                        view.setAgreeController(new com.paula.checkmycar.desktop.controller.EmpleadoSetEditableController(view));
+                        JFrame frame = new JFrame("Editar empleado");
+                        frame.setContentPane(view);
+                        frame.setSize(800, 600);
+                        frame.setLocationRelativeTo(null);
+                        frame.setAlwaysOnTop(true);
+                        frame.setVisible(true);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        javax.swing.JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                    }
+                }
+            }
+        });
+        searchController = new EmpleadoSearchController(this);
+
+        anteriorButton.addActionListener(e -> {
+            if (paginaActual > 1) searchController.buscar(--paginaActual);
+        });
+        siguienteButton.addActionListener(e -> {
+            searchController.buscar(++paginaActual);
+        });
     }
 
+    public void actualizarPaginacion(int pagina, int pageSize, int total) {
+        this.paginaActual = pagina;
+        int totalPaginas = (int) Math.ceil((double) total / pageSize);
+        if (totalPaginas == 0) totalPaginas = 1;
+        paginaLabel.setText("Página " + pagina + " de " + totalPaginas);
+        anteriorButton.setEnabled(pagina > 1);
+        siguienteButton.setEnabled(pagina < totalPaginas);
+    }
 
     public String getNombre() {
         return nombreTF.getText();

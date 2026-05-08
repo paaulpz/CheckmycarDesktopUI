@@ -21,6 +21,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import com.paula.checkmc.model.Empleado;
+import com.paula.checkmc.model.EmpleadoDTO;
 import com.paula.checkmc.model.Genero;
 import com.paula.checkmc.model.Localidad;
 import com.paula.checkmc.model.Pais;
@@ -35,6 +36,7 @@ import com.paula.checkmc.service.impl.PaisServiceImpl;
 import com.paula.checkmc.service.impl.ProvinciaServiceImpl;
 import com.paula.checkmc.service.impl.RolServiceImpl;
 import com.paula.checkmycar.desktop.controller.Controller;
+import com.paula.checkmycar.desktop.controller.EmpleadoSetEditableController;
 import com.paula.checkmycar.desktop.views.renderer.LocalidadCBRender;
 import com.paula.checkmycar.desktop.views.renderer.PaisCBRenderer;
 import com.paula.checkmycar.desktop.views.renderer.ProvinciaCBRenderer;
@@ -486,6 +488,7 @@ public class EmpleadoCreateView extends View {
 
      
         Empleado e = new Empleado();
+        e.setId(empleadoId); 
         e.setNombre(nombreTF.getText().trim());
         e.setPrimerApellido(apellido1TF.getText().trim());
         e.setSegundoApellido(apellido2TF.getText().trim());
@@ -533,5 +536,68 @@ public class EmpleadoCreateView extends View {
 
     public void setCancelController(Controller controller) {
         cancelButton.setAction(controller);
+    }
+    
+    private Long empleadoId;
+
+    public void setEmpleadoDTO(EmpleadoDTO empleado) {
+        this.empleadoId = empleado.getId();
+
+        nombreTF.setText(empleado.getNombre() != null ? empleado.getNombre() : "");
+        apellido1TF.setText(empleado.getPrimerApellido() != null ? empleado.getPrimerApellido() : "");
+        apellido2TF.setText(empleado.getSegundoApellido() != null ? empleado.getSegundoApellido() : "");
+        telefonoTF.setText(empleado.getTelefono() != null ? empleado.getTelefono() : "");
+        emailTF.setText(empleado.getEmail() != null ? empleado.getEmail() : "");
+        dniNieTF.setText(empleado.getDniNie() != null ? empleado.getDniNie() : "");
+
+        for (int i = 0; i < rolComboBox.getItemCount(); i++) {
+            Rol r = rolComboBox.getItemAt(i);
+            if (r.getId() != null && r.getId().equals(empleado.getRolId())) {
+                rolComboBox.setSelectedIndex(i);
+                break;
+            }
+        }
+
+        if (empleado.getGeneroId() != null) {
+            if (empleado.getGeneroId().equals(Genero.MASCULINO.longValue())) masculinoRB.setSelected(true);
+            else if (empleado.getGeneroId().equals(Genero.FEMENINO.longValue())) femeninoRB.setSelected(true);
+            else otroRB.setSelected(true);
+        }
+
+        if (empleado.getLocalidadId() != null) {
+            Localidad localidad = localidadService.findById(empleado.getLocalidadId());
+            if (localidad != null) {
+                Provincia provincia = provinciaService.findById(localidad.getProvinceId());
+                if (provincia != null) {
+                    Pais pais = paisService.findById(provincia.getPaisId());
+                    if (pais != null) {
+                        for (int i = 0; i < paisComboBox.getItemCount(); i++) {
+                            Pais p = (Pais) paisComboBox.getItemAt(i);
+                            if (p.getId() != null && p.getId().equals(pais.getId())) {
+                                paisComboBox.setSelectedIndex(i);
+                                break;
+                            }
+                        }
+                    }
+                    for (int i = 0; i < provinciaComboBox.getItemCount(); i++) {
+                        Provincia prov = (Provincia) provinciaComboBox.getItemAt(i);
+                        if (prov.getId() != null && prov.getId().equals(provincia.getId())) {
+                            provinciaComboBox.setSelectedIndex(i);
+                            break;
+                        }
+                    }
+                }
+                for (int i = 0; i < ciudadComboBox.getItemCount(); i++) {
+                    Localidad loc = (Localidad) ciudadComboBox.getItemAt(i);
+                    if (loc.getId() != null && loc.getId().equals(empleado.getLocalidadId())) {
+                        ciudadComboBox.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            }
+        }
+
+        setEditable(false);
+        setAgreeController(new EmpleadoSetEditableController(this));
     }
 }

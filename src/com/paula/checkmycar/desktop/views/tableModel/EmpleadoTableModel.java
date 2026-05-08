@@ -1,6 +1,5 @@
 package com.paula.checkmycar.desktop.views.tableModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -53,5 +52,9 @@ public class EmpleadoTableModel extends AbstractTableModel {
 
     public EmpleadoDTO getEmpleadoAt(int row) {
         return datos.get(row);
+    }
+    
+    public List<EmpleadoDTO> getEmpleados() {
+        return datos; 
     }
 }
