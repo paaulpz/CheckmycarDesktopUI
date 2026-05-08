@@ -24,7 +24,7 @@ import com.paula.checkmc.model.ClienteDTO;
 import com.paula.checkmycar.desktop.controller.ClienteSearchController;
 import com.paula.checkmycar.desktop.views.renderer.ButtonRenderer;
 import com.paula.checkmycar.desktop.views.tableModel.ClienteTableModel;
-import com.paula.checkmycar.desktop.views.tableModel.editor.ButtonEditor;
+import com.paula.checkmycar.desktop.views.tableModel.editor.ClienteButtonEditor;
 
 public class ClienteSearchView extends View {
 
@@ -32,6 +32,12 @@ public class ClienteSearchView extends View {
     private JTextField emailTF;
     private JTable table;
     private ClienteTableModel tableModel;
+    
+    private JButton anteriorButton;
+    private JButton siguienteButton;
+    private JLabel paginaLabel;
+    private int paginaActual = 1;
+    private ClienteSearchController searchController;
 
     public ClienteSearchView() {
         initialize();
@@ -51,13 +57,6 @@ public class ClienteSearchView extends View {
                 Double.MIN_VALUE };
         gbl_criteriosPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
         criteriosPanel.setLayout(gbl_criteriosPanel);
-
-        JLabel datosLabel = new JLabel("Busqueda de clientes: ");
-        GridBagConstraints gbc_datosLabel = new GridBagConstraints();
-        gbc_datosLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_datosLabel.gridx = 0;
-        gbc_datosLabel.gridy = 0;
-        criteriosPanel.add(datosLabel, gbc_datosLabel);
 
         JLabel dniLabel = new JLabel("DNI/NIE:");
         GridBagConstraints gbc_dniLabel = new GridBagConstraints();
@@ -106,6 +105,7 @@ public class ClienteSearchView extends View {
         criteriosPanel.add(panel, gbc_panel);
 
         JButton limpiarButton = new JButton("Limpiar");
+        limpiarButton.setIcon(new ImageIcon(ClienteSearchView.class.getResource("/icons/16x16/basura.png")));
         limpiarButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dniTF.setText("");
@@ -115,8 +115,8 @@ public class ClienteSearchView extends View {
         });
         panel.add(limpiarButton);
 
-        JButton buscarButton = new JButton("");
-        buscarButton.addActionListener(new ClienteSearchController(this));
+        JButton buscarButton = new JButton("Buscar");
+        buscarButton.addActionListener(e -> searchController.buscar(1));
         buscarButton.setIcon(new ImageIcon(ClienteSearchView.class.getResource("/nuvola/16x16/1339_kmag_kmag.png")));
         panel.add(buscarButton);
 
@@ -128,43 +128,69 @@ public class ClienteSearchView extends View {
 
         JScrollPane scrollPane = new JScrollPane(table);
         resultadosPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        JPanel paginacionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        add(paginacionPanel, BorderLayout.SOUTH);
+
+        anteriorButton = new JButton("◀ Anterior");
+        paginaLabel = new JLabel("Página 1");
+        siguienteButton = new JButton("Siguiente ▶");
+
+        paginacionPanel.add(anteriorButton);
+        paginacionPanel.add(paginaLabel);
+        paginacionPanel.add(siguienteButton);
+
+        anteriorButton.setEnabled(false);
+        siguienteButton.setEnabled(false);
+
+        
     }
 
     private void postInitialize() {
-    	tableModel = new ClienteTableModel();
-    	table.setModel(tableModel);
+        tableModel = new ClienteTableModel();
+        table.setModel(tableModel);
 
-    	
-    	table.setRowHeight(30);
+        table.setRowHeight(30);
 
-    	
-    	table.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer());
-    	table.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(new JCheckBox()));
+        table.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer());
+        table.getColumnModel().getColumn(4).setCellEditor(new ClienteButtonEditor(new JCheckBox()));
 
-    	
-    	table.setSurrendersFocusOnKeystroke(true);
-    	table.setCellSelectionEnabled(true);
+        table.setSurrendersFocusOnKeystroke(true);
+        table.setCellSelectionEnabled(true);
 
-    
-    	table.addMouseListener(new java.awt.event.MouseAdapter() {
-    	    @Override
-    	    public void mouseClicked(java.awt.event.MouseEvent e) {
-    	        int row = table.rowAtPoint(e.getPoint());
-    	        int col = table.columnAtPoint(e.getPoint());
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+                if (col == 4) {
+                    table.editCellAt(row, col);
+                    Component editor = table.getEditorComponent();
+                    if (editor != null) editor.requestFocus();
+                }
+            }
+        });
 
-    	        if (col == 4) {
-    	            table.editCellAt(row, col);
+        searchController = new ClienteSearchController(this);
 
-    	            Component editor = table.getEditorComponent();
-    	            if (editor != null) {
-    	                editor.requestFocus();
-    	            }
-    	        }
-    	    }
-    	});
+        anteriorButton.addActionListener(e -> {
+            if (paginaActual > 1) searchController.buscar(--paginaActual);
+        });
+
+        siguienteButton.addActionListener(e -> {
+            searchController.buscar(++paginaActual);
+        });
     }
 
-  
+    public void actualizarPaginacion(int pagina, int pageSize, int total) {
+        this.paginaActual = pagina;
+        int totalPaginas = (int) Math.ceil((double) total / pageSize);
+        if (totalPaginas == 0) totalPaginas = 1;
+        paginaLabel.setText("Página " + pagina + " de " + totalPaginas);
+        anteriorButton.setEnabled(pagina > 1);
+        siguienteButton.setEnabled(pagina < totalPaginas);
+    }
+    
 
     public String getDni() {
         return dniTF.getText();

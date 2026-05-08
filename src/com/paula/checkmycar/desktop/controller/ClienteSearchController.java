@@ -11,7 +11,7 @@ import com.paula.checkmc.model.Results;
 import com.paula.checkmc.service.impl.ClienteServiceImpl;
 import com.paula.checkmycar.desktop.views.ClienteSearchView;
 
-public class ClienteSearchController extends AbstractAction{
+public class ClienteSearchController extends AbstractAction {
 
     private ClienteSearchView view;
     private ClienteServiceImpl clienteService;
@@ -23,21 +23,23 @@ public class ClienteSearchController extends AbstractAction{
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        buscar(1);
+    }
 
+    public void buscar(int pagina) {
         ClienteCriteria criteria = new ClienteCriteria();
 
-        if (view.getDni() != null && !view.getDni().trim().isEmpty()) {
+        if (view.getDni() != null && !view.getDni().trim().isEmpty())
             criteria.setDniNie(view.getDni().trim());
-        }
 
-        if (view.getEmail() != null && !view.getEmail().trim().isEmpty()) {
+        if (view.getEmail() != null && !view.getEmail().trim().isEmpty())
             criteria.setEmail(view.getEmail().trim());
-        }
 
-        Results<ClienteDTO> results = clienteService.findByCriteria(criteria, 1, 100);
-
+        int pageSize = 10;
+        Results<ClienteDTO> results = clienteService.findByCriteria(criteria, pagina, pageSize);
         List<ClienteDTO> lista = results.getPage();
 
         view.setTableData(lista);
+        view.actualizarPaginacion(pagina, pageSize, results.getTotal());
     }
 }

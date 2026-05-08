@@ -10,7 +10,7 @@ import com.paula.checkmc.model.ClienteDTO;
 public class ClienteTableModel extends AbstractTableModel {
 
 	public static final String[] COLUMN_NAMES = {
-		    "Id", "Nombre", "Email", "Teléfono", "Editar"
+		   "DNI","Nombre", "Email", "Teléfono", "Editar"
 		};
 
     private List<ClienteDTO> clientes;
@@ -42,7 +42,7 @@ public class ClienteTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         ClienteDTO cliente = clientes.get(rowIndex);
         switch (columnIndex) {
-            case 0: return cliente.getId();
+            case 0: return cliente.getDniNie();
             case 1: return cliente.getNombre();
             case 2: return cliente.getEmail();
             case 3: return cliente.getTelefono();
