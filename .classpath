@@ -22,7 +22,6 @@
 	<classpathentry kind="lib" path="lib/jor4j2/log4j-core-2.12.4.jar"/>
 	<classpathentry kind="lib" path="lib/nuvola/Iconos.jar"/>
 	<classpathentry kind="lib" path="lib/nuvola/Iconos (2).jar"/>
-	<classpathentry kind="lib" path="swingx-all-1.6.4.jar.jar"/>
 	<classpathentry kind="lib" path="lib/swinnX/swingx-all-1.6.4.jar.jar"/>
 	<classpathentry kind="lib" path="lib/swinnX/swingx-common-1.6.4.jar.jar"/>
 	<classpathentry kind="lib" path="lib/swinnX/swingx-graphics-1.6.4.jar.jar"/>
