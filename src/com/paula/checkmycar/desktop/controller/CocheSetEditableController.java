@@ -7,13 +7,17 @@ import com.paula.checkmycar.desktop.views.CocheCreateView;
 public class CocheSetEditableController extends Controller {
 
     public CocheSetEditableController(CocheCreateView view) {
+
         super(view, "Editar", null);
     }
 
     @Override
     public void doAction() {
+
         CocheCreateView view = (CocheCreateView) getView();
+
         view.setEditable(true);
+
         view.setAgreeController(new CocheUpdateController(view));
     }
 

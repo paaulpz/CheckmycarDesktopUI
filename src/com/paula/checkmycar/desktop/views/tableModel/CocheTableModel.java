@@ -10,17 +10,13 @@ import com.paula.checkmc.model.CocheDTO;
 public class CocheTableModel extends AbstractTableModel {
 
     public static final String[] COLUMN_NAMES = {
-        "Id", "Matrícula", "Marca", "Modelo", "Bastidor", "Kilómetros", "Precio Final (€)"
+            "Matrícula", "Marca", "Modelo", "Propietario", "Detalles"
     };
 
     private List<CocheDTO> data;
 
     public CocheTableModel() {
         this.data = new ArrayList<>();
-    }
-
-    public CocheTableModel(List<CocheDTO> data) {
-        this.data = data;
     }
 
     @Override
@@ -40,25 +36,46 @@ public class CocheTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+
         CocheDTO coche = data.get(rowIndex);
+
         switch (columnIndex) {
-            case 0: return coche.getId();
-            case 1: return coche.getMatricula();
-            case 2: return coche.getNombreMarca();
-            case 3: return coche.getNombreModelo();
-            case 4: return coche.getNumeroBastidor();
-            case 5: return coche.getKilometros();
-            case 6: return coche.getPrecioFinal();
-            default: return null;
+
+        case 0:
+            return coche.getMatricula();
+
+        case 1:
+            return coche.getNombreMarca();
+
+        case 2:
+            return coche.getNombreModelo();
+
+        case 3:
+            return coche.getNombreCliente();
+
+        case 4:
+            return "Detalles";
+
+        default:
+            return null;
         }
+    }
+
+    public void setData(List<CocheDTO> data) {
+        this.data = data;
+        fireTableDataChanged();
     }
 
     public List<CocheDTO> getData() {
         return data;
     }
 
-    public void setData(List<CocheDTO> resultados) {
-        this.data = resultados;
-        fireTableDataChanged();
+    public CocheDTO getCocheAt(int row) {
+        return data.get(row);
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        return column == 4;
     }
 }

@@ -5,11 +5,15 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -41,7 +45,6 @@ import com.paula.checkmc.service.impl.TipoTransmisionServiceImpl;
 import com.paula.checkmycar.desktop.controller.CocheCreateController;
 import com.paula.checkmycar.desktop.controller.CocheSetEditableController;
 import com.paula.checkmycar.desktop.controller.Controller;
-import com.paula.checkmycar.desktop.views.renderer.ClienteCBRenderer;
 import com.paula.checkmycar.desktop.views.renderer.MarcaCBRenderer;
 import com.paula.checkmycar.desktop.views.renderer.ModeloCBRenderer;
 import com.paula.checkmycar.desktop.views.renderer.TipoCombustibleCBRenderer;
@@ -50,7 +53,6 @@ import com.paula.checkmycar.desktop.views.renderer.TipoTransmisionCBRender;
 
 public class CocheCreateView extends View {
 
-    // Campos de texto
     private JTextField matriculaTF;
     private JTextField bastidorTF;
     private JTextField anoTF;
@@ -58,7 +60,6 @@ public class CocheCreateView extends View {
     private JTextField kmTF;
     private JTextField precioTF;
 
-    // ComboBoxes — campos de clase para poder accederlos desde todos los métodos
     private JComboBox<ClienteDTO>      clienteCB;
     private JComboBox<Marca>           marcaCB;
     private JComboBox<Modelo>          modeloCB;
@@ -66,14 +67,11 @@ public class CocheCreateView extends View {
     private JComboBox<TipoMotor>       motorCB;
     private JComboBox<TipoTransmision> transmisionCB;
 
-    // Botones
     private JButton guardarButton;
     private JButton limpiarButton;
 
-    // ID para edición
     private Long cocheId;
 
-    // Servicios
     private ClienteService        clienteService      = new ClienteServiceImpl();
     private MarcaService          marcaService        = new MarcaServiceImpl();
     private ModeloService         modeloService       = new ModeloServiceImpl();
@@ -91,7 +89,7 @@ public class CocheCreateView extends View {
         setLayout(new BorderLayout());
 
         JPanel formPanel = new JPanel(new GridBagLayout());
-        add(formPanel, BorderLayout.NORTH); 
+        add(formPanel, BorderLayout.NORTH);
 
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5, 5, 5, 5);
@@ -99,7 +97,6 @@ public class CocheCreateView extends View {
 
         int y = 0;
 
-        
         c.gridx = 0; c.gridy = y; formPanel.add(new JLabel("Matrícula *:"), c);
         matriculaTF = new JTextField();
         c.gridx = 1; formPanel.add(matriculaTF, c);
@@ -128,33 +125,31 @@ public class CocheCreateView extends View {
 
         y++;
         c.gridx = 0; c.gridy = y; formPanel.add(new JLabel("Cliente *:"), c);
-        clienteCB = new JComboBox<>();
+        clienteCB = new JComboBox<ClienteDTO>();
         c.gridx = 1; formPanel.add(clienteCB, c);
 
         c.gridx = 2; formPanel.add(new JLabel("Marca *:"), c);
-        marcaCB = new JComboBox<>();
+        marcaCB = new JComboBox<Marca>();
         c.gridx = 3; formPanel.add(marcaCB, c);
 
         y++;
         c.gridx = 0; c.gridy = y; formPanel.add(new JLabel("Modelo *:"), c);
-        modeloCB = new JComboBox<>();
+        modeloCB = new JComboBox<Modelo>();
         c.gridx = 1; formPanel.add(modeloCB, c);
 
         c.gridx = 2; formPanel.add(new JLabel("Combustible *:"), c);
-        combustibleCB = new JComboBox<>();
+        combustibleCB = new JComboBox<TipoCombustible>();
         c.gridx = 3; formPanel.add(combustibleCB, c);
 
-        // Fila 5: Motor / Transmisión
         y++;
         c.gridx = 0; c.gridy = y; formPanel.add(new JLabel("Motor *:"), c);
-        motorCB = new JComboBox<>();
+        motorCB = new JComboBox<TipoMotor>();
         c.gridx = 1; formPanel.add(motorCB, c);
 
         c.gridx = 2; formPanel.add(new JLabel("Transmisión *:"), c);
-        transmisionCB = new JComboBox<>();
+        transmisionCB = new JComboBox<TipoTransmision>();
         c.gridx = 3; formPanel.add(transmisionCB, c);
 
-        // Botones
         JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         add(botonesPanel, BorderLayout.SOUTH);
 
@@ -164,16 +159,27 @@ public class CocheCreateView extends View {
         botonesPanel.add(limpiarButton);
         botonesPanel.add(guardarButton);
 
-        limpiarButton.addActionListener(e -> limpiar());
-        guardarButton.addActionListener(e -> new CocheCreateController(this).doAction());
+        limpiarButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                limpiar();
+            }
+        });
 
-        // Al cambiar marca carga los modelos
-        marcaCB.addActionListener(e -> cargarModelos());
+        guardarButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new CocheCreateController(CocheCreateView.this).doAction();
+            }
+        });
+
+        marcaCB.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cargarModelos();
+            }
+        });
     }
 
     private void postInitialize() {
 
-        clienteCB.setRenderer(new ClienteCBRenderer());
         marcaCB.setRenderer(new MarcaCBRenderer());
         modeloCB.setRenderer(new ModeloCBRenderer());
         combustibleCB.setRenderer(new TipoCombustibleCBRenderer());
@@ -181,58 +187,86 @@ public class CocheCreateView extends View {
         transmisionCB.setRenderer(new TipoTransmisionCBRender());
 
         Results<ClienteDTO> resultado = clienteService.findByCriteria(new ClienteCriteria(), 1, 1000);
-        DefaultComboBoxModel<ClienteDTO> clienteModel = new DefaultComboBoxModel<>();
+        DefaultComboBoxModel<ClienteDTO> clienteModel = new DefaultComboBoxModel<ClienteDTO>();
         ClienteDTO clientePlaceholder = new ClienteDTO();
         clientePlaceholder.setId(null);
         clientePlaceholder.setNombre("Seleccionar");
         clienteModel.addElement(clientePlaceholder);
-        for (ClienteDTO cl : resultado.getPage()) clienteModel.addElement(cl);
+        for (ClienteDTO cl : resultado.getPage()) {
+            clienteModel.addElement(cl);
+        }
         clienteCB.setModel(clienteModel);
-        clienteCB.setRenderer(new ClienteCBRenderer());
-        AutoCompleteDecorator.decorate(clienteCB);  
 
-        DefaultComboBoxModel<Marca> marcaModel = new DefaultComboBoxModel<>();
+        clienteCB.setRenderer(new DefaultListCellRenderer() {
+            public java.awt.Component getListCellRendererComponent(JList<?> list,
+                    Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ClienteDTO) {
+                    ClienteDTO cl = (ClienteDTO) value;
+                    if (cl.getId() == null) {
+                        setText("Seleccionar");
+                    } else {
+                        setText(cl.getDniNie() + " - " + cl.getNombre());
+                    }
+                }
+                return this;
+            }
+        });
+
+        AutoCompleteDecorator.decorate(clienteCB);
+
+        DefaultComboBoxModel<Marca> marcaModel = new DefaultComboBoxModel<Marca>();
         Marca marcaPlaceholder = new Marca();
         marcaPlaceholder.setId(null);
         marcaPlaceholder.setNombre("Seleccionar");
         marcaModel.addElement(marcaPlaceholder);
-        for (Marca m : marcaService.findAll()) marcaModel.addElement(m);
+        for (Marca m : marcaService.findAll()) {
+            marcaModel.addElement(m);
+        }
         marcaCB.setModel(marcaModel);
 
-        DefaultComboBoxModel<TipoCombustible> combustibleModel = new DefaultComboBoxModel<>();
+        DefaultComboBoxModel<TipoCombustible> combustibleModel = new DefaultComboBoxModel<TipoCombustible>();
         TipoCombustible combustiblePlaceholder = new TipoCombustible();
         combustiblePlaceholder.setId(null);
         combustiblePlaceholder.setNombre("Seleccionar");
         combustibleModel.addElement(combustiblePlaceholder);
-        for (TipoCombustible tc : combustibleService.findAll()) combustibleModel.addElement(tc);
+        for (TipoCombustible tc : combustibleService.findAll()) {
+            combustibleModel.addElement(tc);
+        }
         combustibleCB.setModel(combustibleModel);
 
-        DefaultComboBoxModel<TipoMotor> motorModel = new DefaultComboBoxModel<>();
+        DefaultComboBoxModel<TipoMotor> motorModel = new DefaultComboBoxModel<TipoMotor>();
         TipoMotor motorPlaceholder = new TipoMotor();
         motorPlaceholder.setId(null);
         motorPlaceholder.setNombre("Seleccionar");
         motorModel.addElement(motorPlaceholder);
-        for (TipoMotor tm : motorService.findAll()) motorModel.addElement(tm);
+        for (TipoMotor tm : motorService.findAll()) {
+            motorModel.addElement(tm);
+        }
         motorCB.setModel(motorModel);
 
-        DefaultComboBoxModel<TipoTransmision> transmisionModel = new DefaultComboBoxModel<>();
+        DefaultComboBoxModel<TipoTransmision> transmisionModel = new DefaultComboBoxModel<TipoTransmision>();
         TipoTransmision transmisionPlaceholder = new TipoTransmision();
         transmisionPlaceholder.setId(null);
         transmisionPlaceholder.setNombre("Seleccionar");
         transmisionModel.addElement(transmisionPlaceholder);
-        for (TipoTransmision tt : transmisionService.findAll()) transmisionModel.addElement(tt);
+        for (TipoTransmision tt : transmisionService.findAll()) {
+            transmisionModel.addElement(tt);
+        }
         transmisionCB.setModel(transmisionModel);
     }
 
     private void cargarModelos() {
         Marca marca = (Marca) marcaCB.getSelectedItem();
-        DefaultComboBoxModel<Modelo> model = new DefaultComboBoxModel<>();
+        DefaultComboBoxModel<Modelo> model = new DefaultComboBoxModel<Modelo>();
         Modelo placeholder = new Modelo();
         placeholder.setId(null);
         placeholder.setNombre("Seleccionar");
         model.addElement(placeholder);
         if (marca != null && marca.getId() != null) {
-            for (Modelo m : modeloService.findByMarca(marca.getId())) model.addElement(m);
+            for (Modelo m : modeloService.findByMarca(marca.getId())) {
+                model.addElement(m);
+            }
         }
         modeloCB.setModel(model);
     }
@@ -335,7 +369,6 @@ public class CocheCreateView extends View {
         potenciaTF.setEditable(editable);
         kmTF.setEditable(editable);
         precioTF.setEditable(editable);
-
         clienteCB.setEnabled(editable);
         marcaCB.setEnabled(editable);
         modeloCB.setEnabled(editable);
@@ -348,6 +381,9 @@ public class CocheCreateView extends View {
         guardarButton.setAction(controller);
     }
 
+    public void setCancelController(Controller controller) {
+    }
+
     public void setCocheDTO(CocheDTO coche) {
         this.cocheId = coche.getId();
 
@@ -358,7 +394,6 @@ public class CocheCreateView extends View {
         kmTF.setText(String.valueOf((long) coche.getKilometros()));
         precioTF.setText(String.valueOf(coche.getPrecioFinal()));
 
-       
         for (int i = 0; i < marcaCB.getItemCount(); i++) {
             Marca m = marcaCB.getItemAt(i);
             if (m.getId() != null && m.getNombre().equals(coche.getNombreMarca())) {
@@ -367,7 +402,6 @@ public class CocheCreateView extends View {
             }
         }
 
-       
         for (int i = 0; i < modeloCB.getItemCount(); i++) {
             Modelo m = modeloCB.getItemAt(i);
             if (m.getId() != null && m.getNombre().equals(coche.getNombreModelo())) {

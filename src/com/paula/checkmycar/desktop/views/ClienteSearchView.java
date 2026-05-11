@@ -22,7 +22,7 @@ import javax.swing.JTextField;
 
 import com.paula.checkmc.model.ClienteDTO;
 import com.paula.checkmycar.desktop.controller.ClienteSearchController;
-import com.paula.checkmycar.desktop.views.renderer.ButtonRenderer;
+import com.paula.checkmycar.desktop.views.renderer.ClienteEmpleadoButtonRenderer;
 import com.paula.checkmycar.desktop.views.tableModel.ClienteTableModel;
 import com.paula.checkmycar.desktop.views.tableModel.editor.ClienteButtonEditor;
 
@@ -147,26 +147,40 @@ public class ClienteSearchView extends View {
     }
 
     private void postInitialize() {
+
         tableModel = new ClienteTableModel();
         table.setModel(tableModel);
 
         table.setRowHeight(30);
 
-        table.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer());
-        table.getColumnModel().getColumn(4).setCellEditor(new ClienteButtonEditor(new JCheckBox()));
+        table.getColumnModel()
+                .getColumn(4)
+                .setCellRenderer(new ClienteEmpleadoButtonRenderer());
+
+        table.getColumnModel()
+                .getColumn(4)
+                .setCellEditor(new ClienteButtonEditor(new JCheckBox()));
 
         table.setSurrendersFocusOnKeystroke(true);
         table.setCellSelectionEnabled(true);
 
         table.addMouseListener(new java.awt.event.MouseAdapter() {
+
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
+
                 int row = table.rowAtPoint(e.getPoint());
                 int col = table.columnAtPoint(e.getPoint());
+
                 if (col == 4) {
+
                     table.editCellAt(row, col);
+
                     Component editor = table.getEditorComponent();
-                    if (editor != null) editor.requestFocus();
+
+                    if (editor != null) {
+                        editor.requestFocus();
+                    }
                 }
             }
         });
@@ -174,14 +188,16 @@ public class ClienteSearchView extends View {
         searchController = new ClienteSearchController(this);
 
         anteriorButton.addActionListener(e -> {
-            if (paginaActual > 1) searchController.buscar(--paginaActual);
+
+            if (paginaActual > 1) {
+                searchController.buscar(--paginaActual);
+            }
         });
 
         siguienteButton.addActionListener(e -> {
             searchController.buscar(++paginaActual);
         });
     }
-
     public void actualizarPaginacion(int pagina, int pageSize, int total) {
         this.paginaActual = pagina;
         int totalPaginas = (int) Math.ceil((double) total / pageSize);

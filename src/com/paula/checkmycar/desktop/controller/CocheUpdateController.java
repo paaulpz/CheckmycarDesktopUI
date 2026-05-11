@@ -11,30 +11,68 @@ import com.paula.checkmycar.desktop.views.CocheCreateView;
 
 public class CocheUpdateController extends Controller {
 
-    private CocheService cocheService = new CocheServiceImpl();
+    private CocheCreateView view;
+
+    private CocheService cocheService;
 
     public CocheUpdateController(CocheCreateView view) {
+
         super(view, "Actualizar", null);
+
+        this.view = view;
+
+        this.cocheService = new CocheServiceImpl();
     }
 
     @Override
     public void doAction() {
-        CocheCreateView view = (CocheCreateView) getView();
+
         Coche coche = view.getModel();
-        if (coche == null) return;
+
+        if (coche == null)
+            return;
+
+        boolean updated = cocheService.update(coche);
 
         if (coche.getId() == null) {
-            JOptionPane.showMessageDialog(view, "Error: coche sin ID.", "Error", JOptionPane.ERROR_MESSAGE);
+
+            JOptionPane.showMessageDialog(view,
+                    "Error: coche sin ID",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+
             return;
         }
 
-        boolean updated = cocheService.update(coche);
-        if (updated) {
-            JOptionPane.showMessageDialog(view, "Coche actualizado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            view.setEditable(false);
-            view.setAgreeController(new CocheSetEditableController(view));
-        } else {
-            JOptionPane.showMessageDialog(view, "Error al actualizar el coche.", "Error", JOptionPane.ERROR_MESSAGE);
+        try {
+
+            if (updated) {
+
+                JOptionPane.showMessageDialog(view,
+                        "Coche actualizado correctamente.",
+                        "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                view.setEditable(false);
+
+                view.setAgreeController(new CocheSetEditableController(view));
+
+            } else {
+
+                JOptionPane.showMessageDialog(view,
+                        "Error al actualizar el coche",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            JOptionPane.showMessageDialog(view,
+                    "Error en base de datos",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 

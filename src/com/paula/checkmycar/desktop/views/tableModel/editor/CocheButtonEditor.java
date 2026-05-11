@@ -3,7 +3,6 @@ package com.paula.checkmycar.desktop.views.tableModel.editor;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.ImageIcon;
@@ -15,52 +14,51 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
-import com.paula.checkmc.model.ClienteDTO;
-import com.paula.checkmc.service.ClienteService;
-import com.paula.checkmc.service.impl.ClienteServiceImpl;
-import com.paula.checkmycar.desktop.controller.ClienteSetEditableController;
-import com.paula.checkmycar.desktop.controller.Controller;
-import com.paula.checkmycar.desktop.views.ClienteCreateView;
-import com.paula.checkmycar.desktop.views.tableModel.ClienteTableModel;
+import com.paula.checkmc.model.CocheDTO;
+import com.paula.checkmc.service.CocheService;
+import com.paula.checkmc.service.impl.CocheServiceImpl;
+import com.paula.checkmycar.desktop.controller.CocheSetEditableController;
+import com.paula.checkmycar.desktop.views.CocheCreateView;
+import com.paula.checkmycar.desktop.views.tableModel.CocheTableModel;
 
-public class ClienteButtonEditor extends AbstractCellEditor implements TableCellEditor {
+public class CocheButtonEditor extends AbstractCellEditor implements TableCellEditor {
 
     private JPanel panel;
     private JButton editarButton;
     private JButton eliminarButton;
-    private ClienteDTO cliente;
+    private CocheDTO coche;
     private JTable tabla;
-    private ClienteService clienteService = new ClienteServiceImpl();
+    private CocheService cocheService = new CocheServiceImpl();
 
-    public ClienteButtonEditor(JCheckBox checkBox) {
+    public CocheButtonEditor(JCheckBox checkBox) {
 
         panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 0));
 
         editarButton = new JButton();
         editarButton.setIcon(new ImageIcon(
-                ClienteButtonEditor.class.getResource("/icons/16x16/usuarioedit.png")));
+                CocheButtonEditor.class.getResource("/icons/16x16/usuarioedit.png")));
 
         eliminarButton = new JButton();
         eliminarButton.setIcon(new ImageIcon(
-                ClienteButtonEditor.class.getResource("/icons/16x16/basura.png")));
+                CocheButtonEditor.class.getResource("/icons/16x16/basura.png")));
 
         panel.add(editarButton);
         panel.add(eliminarButton);
 
-        editarButton.addActionListener(new ActionListener() {
+        editarButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 fireEditingStopped();
                 try {
-                    ClienteCreateView view = new ClienteCreateView();
-                    view.setClienteDTO(cliente);
+                    CocheCreateView view = new CocheCreateView();
+                    view.setCocheDTO(coche);
                     view.setEditable(false);
-                    view.setAgreeController(new ClienteSetEditableController(view));
-                    JFrame frame = new JFrame("Editar cliente");
+                    view.setAgreeController(new CocheSetEditableController(view));
+                    JFrame frame = new JFrame("Editar coche");
                     frame.setContentPane(view);
                     frame.setSize(800, 600);
                     frame.setLocationRelativeTo(null);
                     frame.setAlwaysOnTop(true);
-                    view.setCancelController(new Controller(view, "Cancelar") {
+                    view.setCancelController(new com.paula.checkmycar.desktop.controller.Controller(view, "Cancelar") {
                         @Override
                         public void doAction() {
                             frame.dispose();
@@ -78,24 +76,24 @@ public class ClienteButtonEditor extends AbstractCellEditor implements TableCell
             }
         });
 
-        eliminarButton.addActionListener(new ActionListener() {
+        eliminarButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 fireEditingStopped();
                 int opcion = JOptionPane.showConfirmDialog(null,
-                    "¿Seguro que deseas eliminar al cliente " + cliente.getNombre() + " " + cliente.getPrimerApellido() + "?",
+                    "¿Seguro que deseas eliminar el coche " + coche.getMatricula() + "?",
                     "Confirmar eliminación",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.WARNING_MESSAGE);
                 if (opcion == JOptionPane.YES_OPTION) {
-                    boolean eliminado = clienteService.delete(cliente.getId());
+                    boolean eliminado = cocheService.delete(coche.getId());
                     if (eliminado) {
-                        JOptionPane.showMessageDialog(null, "Cliente eliminado correctamente.");
-                        ClienteTableModel model = (ClienteTableModel) tabla.getModel();
-                        model.getClientes().remove(cliente);
+                        JOptionPane.showMessageDialog(null, "Coche eliminado correctamente.");
+                        CocheTableModel model = (CocheTableModel) tabla.getModel();
+                        model.getData().remove(coche);
                         model.fireTableDataChanged();
                     } else {
                         JOptionPane.showMessageDialog(null,
-                            "No se puede eliminar el cliente porque tiene datos asociados.",
+                            "No se puede eliminar el coche porque tiene órdenes de trabajo asociadas.\nElimina primero las órdenes de trabajo.",
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                     }
@@ -103,12 +101,11 @@ public class ClienteButtonEditor extends AbstractCellEditor implements TableCell
             }
         });
     }
-
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int row, int column) {
         this.tabla = table;
-        cliente = ((ClienteTableModel) table.getModel()).getClientes().get(row);
+        coche = ((CocheTableModel) table.getModel()).getData().get(row);
         return panel;
     }
 

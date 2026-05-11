@@ -28,7 +28,6 @@ public class PresupuestoTableModel extends AbstractTableModel {
 	public Object getValueAt(int row, int col) {
 		PresupuestoDTO presupuesto = presupuestos.get(row);
 		
-		// Devolvemos el objeto completo para que el renderer pueda extraer los datos necesarios
 		return presupuesto;
 	}
 	
@@ -53,7 +52,7 @@ public class PresupuestoTableModel extends AbstractTableModel {
 		
 		public void setPresupuestos(List<PresupuestoDTO> presupuestos) {
 		this.presupuestos = presupuestos;
-		fireTableDataChanged(); // Notificar a la tabla que los datos han cambiado
+		fireTableDataChanged(); 
 	}
 	
 	

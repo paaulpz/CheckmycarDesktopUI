@@ -9,8 +9,7 @@ import com.paula.checkmc.model.EmpleadoDTO;
 public class EmpleadoTableModel extends AbstractTableModel {
 
     private static final String[] COLUMNAS = {
-         "Nombre", "Primer Apellido", "Segundo Apellido",
-        "DNI/NIE", "Rol", "Editar"
+         "Nombre", "Primer Apellido", "Segundo Apellido", "DNI/NIE", "Rol", "Detalles"
     };
 
     private List<EmpleadoDTO> datos;

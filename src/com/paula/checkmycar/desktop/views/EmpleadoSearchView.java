@@ -26,7 +26,7 @@ import com.paula.checkmc.model.Rol;
 import com.paula.checkmc.service.RolService;
 import com.paula.checkmc.service.impl.RolServiceImpl;
 import com.paula.checkmycar.desktop.controller.EmpleadoSearchController;
-import com.paula.checkmycar.desktop.views.renderer.ButtonRenderer;
+import com.paula.checkmycar.desktop.views.renderer.ClienteEmpleadoButtonRenderer;
 import com.paula.checkmycar.desktop.views.tableModel.EmpleadoTableModel;
 
 public class EmpleadoSearchView extends View {
@@ -200,7 +200,7 @@ public class EmpleadoSearchView extends View {
 
         buscarButton.addActionListener(e -> searchController.buscar(1));
 
-        tabla.getColumn("Editar").setCellRenderer(new ButtonRenderer());
+        tabla.getColumn("Editar").setCellRenderer(new ClienteEmpleadoButtonRenderer());
 
         tabla.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override

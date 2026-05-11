@@ -30,6 +30,7 @@ import com.paula.checkmycar.desktop.controller.OpenHomeViewController;
 import com.paula.checkmycar.desktop.controller.OpenLoginController;
 import com.paula.checkmycar.desktop.controller.PiezaOpenMenuController;
 import com.paula.checkmycar.desktop.controller.PresupuestoOpenMenuController;
+import com.paula.checkmycar.desktop.controller.VentaOpenMenuController;
 import com.paula.checkmycar.desktop.views.View;
 
 /*
@@ -52,6 +53,8 @@ public class CheckmycarWindow {
 	private JButton loginButton;
 	private JButton citaButton;
 	private JButton piezaButton;
+	private JButton ventasButton;
+	private Component rigidArea;
 
 	/**
 	 * Launch the application.
@@ -215,6 +218,16 @@ public class CheckmycarWindow {
 		citaButton.setHorizontalAlignment(SwingConstants.LEFT);
 		citaButton.setAlignmentX(0.0f);
 		menuPanel.add(citaButton);
+		
+		rigidArea = Box.createRigidArea(new Dimension(0, 5));
+		menuPanel.add(rigidArea);
+		
+		ventasButton = new JButton("Ventas ");
+		ventasButton.setMaximumSize(new Dimension(150, 30));
+		ventasButton.setIcon(new ImageIcon(CheckmycarWindow.class.getResource("/icons/16x16/venta.png")));
+		ventasButton.setHorizontalAlignment(SwingConstants.LEFT);
+		ventasButton.setAlignmentX(0.0f);
+		menuPanel.add(ventasButton);
 
 		JPanel eastPanel = new JPanel();
 		mainPanel.add(eastPanel, BorderLayout.EAST);
@@ -287,6 +300,7 @@ public class CheckmycarWindow {
 		loginButton.addActionListener(new OpenLoginController());
 		citaButton.addActionListener(new CitasOpenMenuController(citaButton));
 		piezaButton.addActionListener(new PiezaOpenMenuController(piezaButton));
+		ventasButton.addActionListener(new VentaOpenMenuController(ventasButton));
 		
 		addView("Inicio", new com.paula.checkmycar.desktop.views.HomeView());
 	}
