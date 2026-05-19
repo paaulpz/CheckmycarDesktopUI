@@ -1,11 +1,9 @@
 package com.paula.checkmycar.desktop.main;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 
 import javax.swing.BorderFactory;
@@ -14,296 +12,258 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
-import com.paula.checkmc.dao.ClienteDAO;
-import com.paula.checkmc.dao.EmpleadoDAO;
-import com.paula.checkmc.dao.RolDAO;
+import org.apache.commons.lang3.StringUtils;
+
 import com.paula.checkmc.model.Rol;
-import com.paula.checkmc.service.MailService;
-import com.paula.checkmc.service.impl.MailServiceApacheImpl;
+import com.paula.checkmc.service.RolService;
+import com.paula.checkmc.service.impl.RolServiceImpl;
+import com.paula.checkmycar.desktop.controller.LoginController;
 import com.paula.checkmycar.desktop.views.renderer.RolCBRenderer;
 
-public class LoginWindow {
-
-    private JFrame frame;
-    private JTextField dniField;
-    private JPasswordField passwordField;
+public class LoginWindow extends JFrame {
 
-    private JRadioButton clienteRadio;
-    private JRadioButton empleadoRadio;
-    private JComboBox<Rol> rolCombo;
-    public LoginWindow() {
-        initialize();
-    }
+	private static final long serialVersionUID = 1L;
 
-    
-   
-    private void initialize() {
-
-        frame = new JFrame("CheckMyCar - Login");
-        frame.setSize(350, 350);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.getContentPane().setLayout(new BorderLayout());
-
-        JLabel title = new JLabel("CheckMyCar", SwingConstants.CENTER);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        frame.getContentPane().add(title, BorderLayout.NORTH);
+	private static LoginWindow instance;
 
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel.setLayout(new GridBagLayout());
+	private JPanel contentPane;
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+	private JTextField dniTF;
+	private JPasswordField passwordTF;
 
-       
-        gbc.gridx = 0; gbc.gridy = 0;
-        panel.add(new JLabel("DNI/NIE:"), gbc);
+	private JButton accederButton;
 
-        dniField = new JTextField();
-        gbc.gridx = 1;
-        panel.add(dniField, gbc);
+	private JRadioButton clienteRB;
+	private JRadioButton empleadoRB;
 
-     
-        gbc.gridx = 0; gbc.gridy = 1;
-        panel.add(new JLabel("Contraseña:"), gbc);
+	private JComboBox<Rol> rolCB;
 
-        passwordField = new JPasswordField();
-        gbc.gridx = 1;
-        panel.add(passwordField, gbc);
+	public static void main(String[] args) {
 
-        gbc.gridx = 0; gbc.gridy = 2;
-        panel.add(new JLabel("Tipo:"), gbc);
+		EventQueue.invokeLater(new Runnable() {
 
-        JPanel tipoPanel = new JPanel();
+			public void run() {
 
-        clienteRadio = new JRadioButton("Cliente", true);
-        empleadoRadio = new JRadioButton("Empleado");
+				try {
 
-   
-        ButtonGroup group = new ButtonGroup();
-        group.add(clienteRadio);
-        group.add(empleadoRadio);
+					LoginWindow frame = LoginWindow.getInstance();
 
-        tipoPanel.add(clienteRadio);
-        tipoPanel.add(empleadoRadio);
+					frame.setVisible(true);
 
-        gbc.gridx = 1;
-        panel.add(tipoPanel, gbc);
+				} catch (Exception e) {
 
-     
-        gbc.gridx = 0; gbc.gridy = 3;
-        panel.add(new JLabel("Rol:"), gbc);
-        rolCombo = new JComboBox<Rol>();
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
-        rolCombo.setRenderer(new RolCBRenderer());
+	public static LoginWindow getInstance() {
 
-        RolDAO rolDAO = new RolDAO();
+		if (instance == null) {
 
-        for (Rol r : rolDAO.findAll()) {
-            rolCombo.addItem(r);
-        }
-        
-        rolCombo.setVisible(false);
+			instance = new LoginWindow();
+		}
 
-        gbc.gridx = 1;
-        panel.add(rolCombo, gbc);
+		return instance;
+	}
 
-       
-        JButton loginButton = new JButton("Entrar");
-        gbc.gridx = 1; gbc.gridy = 4;
-        panel.add(loginButton, gbc);
+	public LoginWindow() {
 
-      
-        JButton forgotButton = new JButton("¿Olvidaste la contraseña?");
-        forgotButton.setBorderPainted(false);
-        forgotButton.setContentAreaFilled(false);
-        forgotButton.setForeground(Color.BLUE);
+		initialize();
 
-        gbc.gridx = 1; gbc.gridy = 5;
-        panel.add(forgotButton, gbc);
+		postInitialize();
 
-        frame.getContentPane().add(panel, BorderLayout.CENTER);
+		setVisible(true);
+	}
 
-       
-        empleadoRadio.addActionListener(e -> {
-            rolCombo.setVisible(true);
-            panel.revalidate();
-            panel.repaint();
-        });
+	private void initialize() {
 
-        clienteRadio.addActionListener(e -> {
-            rolCombo.setVisible(false);
-            panel.revalidate();
-            panel.repaint();
-        });
+		setTitle("CheckMyCar - Login");
 
-        loginButton.addActionListener(e -> login());
-        forgotButton.addActionListener(e -> recuperarPassword());
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.setVisible(true);
-    }
+		setSize(400, 350);
 
-    private void login() {
+		setResizable(false);
 
-        String dni = dniField.getText().trim();
-        String pass = new String(passwordField.getPassword()).trim();
+		setLocationRelativeTo(null);
 
-        if (dni.isEmpty() || pass.isEmpty()) {
+		contentPane = new JPanel();
 
-            JOptionPane.showMessageDialog(frame,
-                    "Rellena todos los campos");
+		contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            return;
-        }
+		setContentPane(contentPane);
 
-        if (clienteRadio.isSelected()) {
+		GridBagLayout gbl = new GridBagLayout();
 
-            ClienteDAO dao = new ClienteDAO();
+		gbl.columnWidths = new int[] { 0, 0, 0 };
+		gbl.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
 
-            if (!dao.existeDni(dni)) {
+		contentPane.setLayout(gbl);
 
-                JOptionPane.showMessageDialog(frame,
-                        "DNI inexistente");
+		GridBagConstraints gbc = new GridBagConstraints();
 
-                return;
-            }
+		gbc.insets = new Insets(5, 5, 5, 5);
 
-            if (!dao.login(dni, pass)) {
+		JLabel titleLabel = new JLabel("CheckMyCar");
 
-                JOptionPane.showMessageDialog(frame,
-                        "Contraseña incorrecta");
+		gbc.gridx = 1;
+		gbc.gridy = 0;
 
-                return;
-            }
+		contentPane.add(titleLabel, gbc);
 
-            entrar();
-        }
+		JLabel dniLabel = new JLabel("DNI/NIE");
 
-        else if (empleadoRadio.isSelected()) {
+		gbc.gridx = 1;
+		gbc.gridy = 1;
 
-            Rol rol = (Rol) rolCombo.getSelectedItem();
+		contentPane.add(dniLabel, gbc);
 
-            if (rol == null || rol.getId() == null) {
+		dniTF = new JTextField();
 
-                JOptionPane.showMessageDialog(frame,
-                        "Selecciona un rol");
+		dniTF.setColumns(15);
 
-                return;
-            }
+		gbc.gridx = 1;
+		gbc.gridy = 2;
 
-            EmpleadoDAO dao = new EmpleadoDAO();
+		contentPane.add(dniTF, gbc);
 
-            if (!dao.existeDni(dni)) {
+		JLabel passwordLabel = new JLabel("Contraseña");
 
-                JOptionPane.showMessageDialog(frame,
-                        "DNI inexistente");
+		gbc.gridx = 1;
+		gbc.gridy = 3;
 
-                return;
-            }
+		contentPane.add(passwordLabel, gbc);
 
-            if (!dao.login(dni, pass, rol.getId())) {
+		passwordTF = new JPasswordField();
 
-                JOptionPane.showMessageDialog(frame,
-                        "Contraseña incorrecta");
+		passwordTF.setColumns(15);
 
-                return;
-            }
+		gbc.gridx = 1;
+		gbc.gridy = 4;
 
-            entrar();
-        }
-    }
-    
-  
-    private void recuperarPassword() {
+		contentPane.add(passwordTF, gbc);
 
-        String email =
-                JOptionPane.showInputDialog(frame,
-                        "Introduce tu email:");
+		JPanel tipoPanel = new JPanel(new BorderLayout());
 
-        if (email == null || email.trim().isEmpty()) {
-            return;
-        }
+		clienteRB = new JRadioButton("Cliente");
+		empleadoRB = new JRadioButton("Empleado");
 
-        ClienteDAO clienteDAO = new ClienteDAO();
-        EmpleadoDAO empleadoDAO = new EmpleadoDAO();
+		clienteRB.setSelected(true);
 
-        boolean existe =
-                clienteDAO.existeCorreo(email)
-                || empleadoDAO.existeCorreo(email);
+		ButtonGroup group = new ButtonGroup();
 
-        if (!existe) {
+		group.add(clienteRB);
+		group.add(empleadoRB);
 
-            JOptionPane.showMessageDialog(frame,
-                    "Correo incorrecto");
+		tipoPanel.add(clienteRB, BorderLayout.WEST);
+		tipoPanel.add(empleadoRB, BorderLayout.EAST);
 
-            return;
-        }
+		gbc.gridx = 1;
+		gbc.gridy = 5;
 
-        cambiarPassword(email);
-    }
+		contentPane.add(tipoPanel, gbc);
 
-    private void cambiarPassword(String email) {
+		rolCB = new JComboBox<>();
 
-        JPanel panel = new JPanel(new GridLayout(2, 2));
+		rolCB.setRenderer(new RolCBRenderer());
 
-        JPasswordField pass1 = new JPasswordField();
-        JPasswordField pass2 = new JPasswordField();
+		RolService rolService = new RolServiceImpl();
+		try {
 
-        panel.add(new JLabel("Nueva contraseña:"));
-        panel.add(pass1);
-        panel.add(new JLabel("Repetir contraseña:"));
-        panel.add(pass2);
+			Rol placeholder = new Rol();
 
-        int result = JOptionPane.showConfirmDialog(frame, panel,
-                "Cambiar contraseña", JOptionPane.OK_CANCEL_OPTION);
+			placeholder.setId(null);
 
-        if (result == JOptionPane.OK_OPTION) {
+			placeholder.setNombre("Seleccionar");
 
-            String p1 = new String(pass1.getPassword());
-            String p2 = new String(pass2.getPassword());
+			rolCB.addItem(placeholder);
 
-            if (!p1.equals(p2)) {
-                JOptionPane.showMessageDialog(frame, "Las contraseñas no coinciden");
-                return;
-            }
+			for (Rol r : rolService.findAll()) {
+				rolCB.addItem(r);
+			}
 
-            try {
-                MailService mailService = new MailServiceApacheImpl();
+		} catch (Exception e) {
 
-                mailService.sendEmail(
-                        email,
-                        "Cambio de contraseña",
-                        "Tu contraseña ha sido cambiada correctamente.",
-                        "CheckMyCar"
-                );
+			e.printStackTrace();
 
-                JOptionPane.showMessageDialog(frame,
-                        "Contraseña cambiada y correo enviado");
+			javax.swing.JOptionPane.showMessageDialog(this, "Error cargando roles", "Error",
+					javax.swing.JOptionPane.ERROR_MESSAGE);
+		}
 
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(frame,
-                        "Error enviando correo");
-            }
-        }
-    }
+		rolCB.setVisible(false);
 
-    private void entrar() {
-    	 JOptionPane.showMessageDialog(frame, "¡Bienvenido!");
-         frame.dispose();
+		gbc.gridx = 1;
+		gbc.gridy = 6;
 
-         CheckmycarWindow.getInstance().frame.setVisible(true);
-    }
+		contentPane.add(rolCB, gbc);
 
-    private void error() {
-        JOptionPane.showMessageDialog(frame, "ERROR: Credenciales incorrectas");
-    }
+		accederButton = new JButton("Acceder");
+
+		gbc.gridx = 1;
+		gbc.gridy = 7;
+
+		contentPane.add(accederButton, gbc);
+
+		empleadoRB.addActionListener(e -> {
+
+			rolCB.setVisible(true);
+
+			contentPane.revalidate();
+			contentPane.repaint();
+		});
+
+		clienteRB.addActionListener(e -> {
+
+			rolCB.setVisible(false);
+
+			contentPane.revalidate();
+			contentPane.repaint();
+		});
+	}
+
+	private void postInitialize() {
+
+		LoginController loginController = new LoginController(this);
+
+		accederButton.addActionListener(loginController);
+	}
+
+	public String getDni() {
+
+		return StringUtils.trimToNull(dniTF.getText());
+	}
+
+	public String getPassword() {
+
+		return StringUtils.trimToNull(new String(passwordTF.getPassword()));
+	}
+
+	public boolean isClienteSelected() {
+
+		return clienteRB.isSelected();
+	}
+
+	public boolean isEmpleadoSelected() {
+
+		return empleadoRB.isSelected();
+	}
+
+	public Rol getRolSeleccionado() {
+
+		Rol rol = (Rol) rolCB.getSelectedItem();
+
+		if (rol == null || rol.getId() == null) {
+
+			return null;
+		}
+
+		return rol;
+	}
 }

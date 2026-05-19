@@ -26,11 +26,12 @@ import com.paula.checkmycar.desktop.controller.CitasOpenMenuController;
 import com.paula.checkmycar.desktop.controller.ClienteOpenMenuController;
 import com.paula.checkmycar.desktop.controller.CocheOpenMenuController;
 import com.paula.checkmycar.desktop.controller.EmpleadoOpenMenuController;
+import com.paula.checkmycar.desktop.controller.LogoutController;
 import com.paula.checkmycar.desktop.controller.OpenHomeViewController;
-import com.paula.checkmycar.desktop.controller.OpenLoginController;
+import com.paula.checkmycar.desktop.controller.OrdenTrabajoOpenMenuController;
 import com.paula.checkmycar.desktop.controller.PiezaOpenMenuController;
 import com.paula.checkmycar.desktop.controller.PresupuestoOpenMenuController;
-import com.paula.checkmycar.desktop.controller.VentaOpenMenuController;
+import com.paula.checkmycar.desktop.controller.VentasOpenMenuController;
 import com.paula.checkmycar.desktop.views.View;
 
 /*
@@ -40,7 +41,7 @@ public class CheckmycarWindow {
 
 	private static CheckmycarWindow instance = null;
 
-	JFrame frame;
+	public JFrame frame;
 	private JTabbedPane contentTabbedPane;
 	private JPanel centerPanel;
 	private JButton citasButton;
@@ -59,24 +60,30 @@ public class CheckmycarWindow {
 	/**
 	 * Launch the application.
 	 */
-	//    EventQueue.invokeLater(() -> {
-	//        new LoginWindow();
-	 
-	    
-		public static void main(String[] args) {
-			EventQueue.invokeLater(new Runnable() {
+	// EventQueue.invokeLater(() -> {
+	// new LoginWindow();
 
-				@Override
-				public void run() {
-					try {
-						UIManager.setLookAndFeel( "com.formdev.flatlaf.themes.FlatMacLightLaf");
-						
-						getInstance().frame.setVisible(true);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+	public static void main(String[] args) {
+
+		EventQueue.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+
+				try {
+
+					UIManager.setLookAndFeel("com.formdev.flatlaf.themes.FlatMacLightLaf");
+
+					LoginWindow login = new LoginWindow();
+
+					login.setVisible(true);
+
+				} catch (Exception e) {
+
+					e.printStackTrace();
 				}
-			});
+			}
+		});
 	}
 
 	/**
@@ -134,7 +141,7 @@ public class CheckmycarWindow {
 		gbc_inicioButton.gridx = 0;
 		gbc_inicioButton.gridy = 0;
 		northPanel.add(inicioButton, gbc_inicioButton);
-		
+
 		piezaButton = new JButton("");
 		piezaButton.setIcon(new ImageIcon(CheckmycarWindow.class.getResource("/icons/32x32/mantenimiento.png")));
 		GridBagConstraints gbc_piezaButton = new GridBagConstraints();
@@ -211,17 +218,18 @@ public class CheckmycarWindow {
 		menuPanel.add(rigidArea_1);
 		menuPanel.add(presupuestoButton);
 		menuPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-		
+
 		citaButton = new JButton("citas ");
 		citaButton.setMaximumSize(new Dimension(150, 30));
-		citaButton.setIcon(new ImageIcon(CheckmycarWindow.class.getResource("/nuvola/16x16/1529_gaming_gaming_game_blue_controller_folder_game_games_blue_controller_folder_games.png")));
+		citaButton.setIcon(new ImageIcon(CheckmycarWindow.class.getResource(
+				"/nuvola/16x16/1529_gaming_gaming_game_blue_controller_folder_game_games_blue_controller_folder_games.png")));
 		citaButton.setHorizontalAlignment(SwingConstants.LEFT);
 		citaButton.setAlignmentX(0.0f);
 		menuPanel.add(citaButton);
-		
+
 		rigidArea = Box.createRigidArea(new Dimension(0, 5));
 		menuPanel.add(rigidArea);
-		
+
 		ventasButton = new JButton("Ventas ");
 		ventasButton.setMaximumSize(new Dimension(150, 30));
 		ventasButton.setIcon(new ImageIcon(CheckmycarWindow.class.getResource("/icons/16x16/venta.png")));
@@ -297,11 +305,13 @@ public class CheckmycarWindow {
 		presupuestoButton.addActionListener(new PresupuestoOpenMenuController(presupuestoButton));
 		empleadoButton.addActionListener(new EmpleadoOpenMenuController(empleadoButton));
 		inicioButton.addActionListener(new OpenHomeViewController());
-		loginButton.addActionListener(new OpenLoginController());
+		loginButton.addActionListener(new LogoutController());
 		citaButton.addActionListener(new CitasOpenMenuController(citaButton));
 		piezaButton.addActionListener(new PiezaOpenMenuController(piezaButton));
-		ventasButton.addActionListener(new VentaOpenMenuController(ventasButton));
-		
+		ventasButton.addActionListener(new VentasOpenMenuController(ventasButton));
+		ordenButton.addActionListener(new OrdenTrabajoOpenMenuController(ordenButton));
+		presupuestoButton.addActionListener(new PresupuestoOpenMenuController(presupuestoButton));
+
 		addView("Inicio", new com.paula.checkmycar.desktop.views.HomeView());
 	}
 
