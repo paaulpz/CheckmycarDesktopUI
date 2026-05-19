@@ -27,40 +27,46 @@ public class CocheUpdateController extends Controller {
     @Override
     public void doAction() {
 
-        Coche coche = view.getModel();
-
-        if (coche == null)
-            return;
-
-        boolean updated = cocheService.update(coche);
-
-        if (coche.getId() == null) {
-
-            JOptionPane.showMessageDialog(view,
-                    "Error: coche sin ID",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-
-            return;
-        }
-
         try {
+
+            Coche coche = view.getModel();
+
+            if (coche == null) {
+                return;
+            }
+
+            if (coche.getId() == null) {
+
+                JOptionPane.showMessageDialog(
+                        view,
+                        "Error: coche sin ID.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+
+                return;
+            }
+
+            boolean updated =
+                    cocheService.update(coche);
 
             if (updated) {
 
-                JOptionPane.showMessageDialog(view,
+                JOptionPane.showMessageDialog(
+                        view,
                         "Coche actualizado correctamente.",
                         "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
 
                 view.setEditable(false);
 
-                view.setAgreeController(new CocheSetEditableController(view));
+                view.setAgreeController(
+                        new CocheSetEditableController(view));
 
             } else {
 
-                JOptionPane.showMessageDialog(view,
-                        "Error al actualizar el coche",
+                JOptionPane.showMessageDialog(
+                        view,
+                        "No se pudo actualizar el coche.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -69,8 +75,9 @@ public class CocheUpdateController extends Controller {
 
             e.printStackTrace();
 
-            JOptionPane.showMessageDialog(view,
-                    "Error en base de datos",
+            JOptionPane.showMessageDialog(
+                    view,
+                    "Error al actualizar el coche.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -78,6 +85,7 @@ public class CocheUpdateController extends Controller {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
         doAction();
     }
 }
