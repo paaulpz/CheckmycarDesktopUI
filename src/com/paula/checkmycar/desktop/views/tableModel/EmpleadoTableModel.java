@@ -9,7 +9,7 @@ import com.paula.checkmc.model.EmpleadoDTO;
 public class EmpleadoTableModel extends AbstractTableModel {
 
     private static final String[] COLUMNAS = {
-         "Nombre", "Primer Apellido", "Segundo Apellido", "DNI/NIE", "Rol", "Detalles"
+         "Nombre", "Primer Apellido", "Segundo Apellido", "DNI/NIE", "Rol", "Acciones"
     };
 
     private List<EmpleadoDTO> datos;
@@ -44,7 +44,7 @@ public class EmpleadoTableModel extends AbstractTableModel {
             case 2: return e.getSegundoApellido();
             case 3: return e.getDniNie();
             case 4: return e.getNombreRol();
-            case 5: return "editar";
+            case 5: return "";
             default: return null;
         }
     }
@@ -55,5 +55,13 @@ public class EmpleadoTableModel extends AbstractTableModel {
     
     public List<EmpleadoDTO> getEmpleados() {
         return datos; 
+    }
+    
+    @Override
+    public boolean isCellEditable(
+            int rowIndex,
+            int columnIndex) {
+
+        return columnIndex == 5;
     }
 }
