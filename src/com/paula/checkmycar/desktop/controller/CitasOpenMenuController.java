@@ -9,22 +9,30 @@ import javax.swing.JPopupMenu;
 
 public class CitasOpenMenuController extends AbstractAction {
 
-    private Component parent;
+	private Component parent;
 
-    public CitasOpenMenuController(Component parent) {
-        this.parent = parent;
-    }
+	public CitasOpenMenuController(Component parent) {
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        JPopupMenu menu = new JPopupMenu();
+		this.parent = parent;
+	}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
 
-        JMenuItem nuevaItem = new JMenuItem("Nueva ");
-        nuevaItem.addActionListener(new CitaOpenCreateController());
+		JPopupMenu menu = new JPopupMenu();
 
-        menu.add(nuevaItem);
+		JMenuItem nuevaItem = new JMenuItem("Nueva");
 
-        menu.show(parent, 0, parent.getHeight());
-    }
+		nuevaItem.addActionListener(new CitaOpenCreateController());
+
+		menu.add(nuevaItem);
+
+		JMenuItem buscarItem = new JMenuItem("Buscar");
+
+		buscarItem.addActionListener(new CitaOpenSearchController());
+
+		menu.add(buscarItem);
+
+		menu.show(parent, 0, parent.getHeight());
+	}
 }

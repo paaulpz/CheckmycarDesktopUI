@@ -23,329 +23,332 @@ import com.paula.checkmc.model.ClienteCriteria;
 import com.paula.checkmc.model.ClienteDTO;
 import com.paula.checkmc.model.CocheCriteria;
 import com.paula.checkmc.model.CocheDTO;
-import com.paula.checkmc.model.EstadoCita;
 import com.paula.checkmc.model.Results;
 import com.paula.checkmc.service.ClienteService;
 import com.paula.checkmc.service.CocheService;
-import com.paula.checkmc.service.EstadoCitaService;
 import com.paula.checkmc.service.impl.ClienteServiceImpl;
 import com.paula.checkmc.service.impl.CocheServiceImpl;
-import com.paula.checkmc.service.impl.EstadoCitaServiceImpl;
 import com.paula.checkmycar.desktop.controller.CitaCreateController;
 import com.paula.checkmycar.desktop.controller.CitaSetEditableController;
 import com.paula.checkmycar.desktop.controller.Controller;
+import com.paula.checkmycar.desktop.views.renderer.ClienteCBRenderer;
+import com.paula.checkmycar.desktop.views.renderer.CocheCBRenderer;
 import com.toedter.calendar.JDateChooser;
 
 public class CitaCreateView extends View {
 
-    private JDateChooser dateChooser;
-    private JTextField descripcionTF;
-    private JComboBox<ClienteDTO> clienteCB;
-    private JComboBox<CocheDTO> cocheCB;
-    private JComboBox<EstadoCita> estadoCB;
+	private JDateChooser dateChooser;
 
-    private JButton guardarButton;
-    private JButton cancelarButton;
+	private JTextField descripcionTF;
 
-    private Long citaId;
+	private JComboBox<ClienteDTO> clienteCB;
 
-    private ClienteService clienteService = new ClienteServiceImpl();
-    private CocheService cocheService = new CocheServiceImpl();
-    private EstadoCitaService estadoService = new EstadoCitaServiceImpl();
+	private JComboBox<CocheDTO> cocheCB;
 
-    public CitaCreateView() {
-        initComponents();
-        postInitialize();
-    }
+	private JButton guardarButton;
 
-    private void initComponents() {
-        setName("Crear cita");
-        setLayout(new BorderLayout(0, 0));
+	private JButton cancelarButton;
 
-        JPanel contentPanel = new JPanel();
-        add(contentPanel, BorderLayout.CENTER);
+	private Long citaId;
 
-        GridBagLayout gbl = new GridBagLayout();
-        gbl.columnWidths = new int[]{0, 200, 0, 200, 0};
-        gbl.rowHeights = new int[]{0, 0, 0, 0, 0};
-        gbl.columnWeights = new double[]{0.0, 1.0, 0.0, 1.0, Double.MIN_VALUE};
-        gbl.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-        contentPanel.setLayout(gbl);
+	private ClienteService clienteService;
 
-        // Fila 0: Fecha / Estado
-        JLabel fechaLabel = new JLabel("Fecha *:");
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(10, 10, 5, 5);
-        gbc.gridx = 0; gbc.gridy = 0;
-        contentPanel.add(fechaLabel, gbc);
+	private CocheService cocheService;
 
-        dateChooser = new JDateChooser();
-        dateChooser.setDateFormatString("dd/MM/yyyy");
-        gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(10, 0, 5, 10);
-        gbc.gridx = 1; gbc.gridy = 0;
-        contentPanel.add(dateChooser, gbc);
+	public CitaCreateView() {
 
-        JLabel estadoLabel = new JLabel("Estado *:");
-        gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(10, 10, 5, 5);
-        gbc.gridx = 2; gbc.gridy = 0;
-        contentPanel.add(estadoLabel, gbc);
+		clienteService = new ClienteServiceImpl();
 
-        estadoCB = new JComboBox<>();
-        gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(10, 0, 5, 10);
-        gbc.gridx = 3; gbc.gridy = 0;
-        contentPanel.add(estadoCB, gbc);
+		cocheService = new CocheServiceImpl();
 
-        // Fila 1: Cliente / Coche
-        JLabel clienteLabel = new JLabel("Cliente (DNI) *:");
-        gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 10, 5, 5);
-        gbc.gridx = 0; gbc.gridy = 1;
-        contentPanel.add(clienteLabel, gbc);
+		initialize();
 
-        clienteCB = new JComboBox<>();
-        gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 0, 5, 10);
-        gbc.gridx = 1; gbc.gridy = 1;
-        contentPanel.add(clienteCB, gbc);
+		postInitialize();
+	}
 
-        JLabel cocheLabel = new JLabel("Coche (Matrícula) *:");
-        gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 10, 5, 5);
-        gbc.gridx = 2; gbc.gridy = 1;
-        contentPanel.add(cocheLabel, gbc);
+	private void initialize() {
 
-        cocheCB = new JComboBox<>();
-        gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 0, 5, 10);
-        gbc.gridx = 3; gbc.gridy = 1;
-        contentPanel.add(cocheCB, gbc);
+		setName("Crear cita");
 
-        // Fila 2: Descripción
-        JLabel descLabel = new JLabel("Descripción:");
-        gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 10, 10, 5);
-        gbc.gridx = 0; gbc.gridy = 2;
-        contentPanel.add(descLabel, gbc);
+		setLayout(new BorderLayout());
 
-        descripcionTF = new JTextField();
-        gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 0, 10, 10);
-        gbc.gridwidth = 3;
-        gbc.gridx = 1; gbc.gridy = 2;
-        contentPanel.add(descripcionTF, gbc);
+		JPanel contentPanel = new JPanel(new GridBagLayout());
 
-        // Botones
-        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        add(buttonsPanel, BorderLayout.SOUTH);
+		add(contentPanel, BorderLayout.NORTH);
 
-        guardarButton = new JButton("Guardar");
-        cancelarButton = new JButton("Cancelar");
+		GridBagConstraints c = new GridBagConstraints();
 
-        buttonsPanel.add(cancelarButton);
-        buttonsPanel.add(guardarButton);
+		c.insets = new Insets(10, 10, 5, 5);
 
-        guardarButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                new CitaCreateController(CitaCreateView.this).doAction();
-            }
-        });
+		c.fill = GridBagConstraints.HORIZONTAL;
 
-        // Al cambiar cliente carga sus coches
-        clienteCB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                cargarCoches();
-            }
-        });
-    }
+		int y = 0;
 
-    private void postInitialize() {
+		c.gridx = 0;
+		c.gridy = y;
 
-        // Renderer cliente — muestra DNI
-        clienteCB.setRenderer(new javax.swing.DefaultListCellRenderer() {
-            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list,
-                    Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof ClienteDTO) {
-                    ClienteDTO c = (ClienteDTO) value;
-                    setText(c.getId() == null ? "Seleccionar" : c.getDniNie() + " - " + c.getNombre());
-                }
-                return this;
-            }
-        });
+		contentPanel.add(new JLabel("Fecha *:"), c);
 
-        // Renderer coche — muestra matrícula
-        cocheCB.setRenderer(new javax.swing.DefaultListCellRenderer() {
-            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list,
-                    Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof CocheDTO) {
-                    CocheDTO co = (CocheDTO) value;
-                    setText(co.getId() == null ? "Seleccionar" : co.getMatricula());
-                }
-                return this;
-            }
-        });
+		dateChooser = new JDateChooser();
 
-        // Renderer estado
-        estadoCB.setRenderer(new javax.swing.DefaultListCellRenderer() {
-            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list,
-                    Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof EstadoCita) {
-                    EstadoCita est = (EstadoCita) value;
-                    setText(est.getId() == null ? "Seleccionar" : est.getNombre());
-                }
-                return this;
-            }
-        });
+		dateChooser.setDateFormatString("dd/MM/yyyy");
 
-        // Cargar clientes
-        Results<ClienteDTO> clientes = clienteService.findByCriteria(new ClienteCriteria(), 1, 1000);
-        DefaultComboBoxModel<ClienteDTO> clienteModel = new DefaultComboBoxModel<>();
-        ClienteDTO clientePlaceholder = new ClienteDTO();
-        clientePlaceholder.setId(null);
-        clientePlaceholder.setNombre("Seleccionar");
-        clienteModel.addElement(clientePlaceholder);
-        for (ClienteDTO cl : clientes.getPage()) clienteModel.addElement(cl);
-        clienteCB.setModel(clienteModel);
+		c.gridx = 1;
 
-        // Placeholder coche
-        DefaultComboBoxModel<CocheDTO> cocheModel = new DefaultComboBoxModel<>();
-        CocheDTO cochePlaceholder = new CocheDTO();
-        cochePlaceholder.setId(null);
-        cochePlaceholder.setMatricula("Seleccionar");
-        cocheModel.addElement(cochePlaceholder);
-        cocheCB.setModel(cocheModel);
+		contentPanel.add(dateChooser, c);
 
-        // Cargar estados
-        DefaultComboBoxModel<EstadoCita> estadoModel = new DefaultComboBoxModel<>();
-        EstadoCita estadoPlaceholder = new EstadoCita();
-        estadoPlaceholder.setId(null);
-        estadoPlaceholder.setNombre("Seleccionar");
-        estadoModel.addElement(estadoPlaceholder);
-        for (EstadoCita est : estadoService.findAll()) estadoModel.addElement(est);
-        estadoCB.setModel(estadoModel);
-    }
+		y++;
 
-    private void cargarCoches() {
-        ClienteDTO cliente = (ClienteDTO) clienteCB.getSelectedItem();
-        DefaultComboBoxModel<CocheDTO> model = new DefaultComboBoxModel<>();
-        CocheDTO placeholder = new CocheDTO();
-        placeholder.setId(null);
-        placeholder.setMatricula("Seleccionar");
-        model.addElement(placeholder);
+		c.gridx = 0;
+		c.gridy = y;
 
-        if (cliente != null && cliente.getId() != null) {
-            CocheCriteria criteria = new CocheCriteria();
-            criteria.setClienteId(cliente.getId());
-            Results<CocheDTO> coches = cocheService.findByCriteria(criteria, 1, 1000);
-            for (CocheDTO coche : coches.getPage()) model.addElement(coche);
-        }
-        cocheCB.setModel(model);
-    }
+		contentPanel.add(new JLabel("Cliente *:"), c);
 
-    public Cita getModel() {
-        if (dateChooser.getDate() == null) {
-            JOptionPane.showMessageDialog(this, "La fecha es obligatoria.", "Error", JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
+		clienteCB = new JComboBox<>();
 
-        ClienteDTO cliente = (ClienteDTO) clienteCB.getSelectedItem();
-        if (cliente == null || cliente.getId() == null) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un cliente.", "Error", JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
+		c.gridx = 1;
 
-        CocheDTO coche = (CocheDTO) cocheCB.getSelectedItem();
-        if (coche == null || coche.getId() == null) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un coche.", "Error", JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
+		contentPanel.add(clienteCB, c);
 
-        EstadoCita estado = (EstadoCita) estadoCB.getSelectedItem();
-        if (estado == null || estado.getId() == null) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un estado.", "Error", JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
+		c.gridx = 2;
 
-        Date date = dateChooser.getDate();
-        LocalDateTime fecha = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		contentPanel.add(new JLabel("Coche *:"), c);
 
-        Cita cita = new Cita();
-        cita.setId(citaId);
-        cita.setFecha(fecha);
-        cita.setDescripcion(descripcionTF.getText().trim());
-        cita.setClienteId(cliente.getId());
-        cita.setCocheId(coche.getId());
-        cita.setEstadoCitaId(estado.getId());
+		cocheCB = new JComboBox<>();
 
-        return cita;
-    }
+		c.gridx = 3;
 
-    public void setEditable(boolean editable) {
-        dateChooser.setEnabled(editable);
-        descripcionTF.setEditable(editable);
-        clienteCB.setEnabled(editable);
-        cocheCB.setEnabled(editable);
-        estadoCB.setEnabled(editable);
-    }
+		contentPanel.add(cocheCB, c);
 
-    public void setAgreeController(Controller controller) {
-        guardarButton.setAction(controller);
-    }
+		y++;
 
-    public void setCancelController(Controller controller) {
-        cancelarButton.setAction(controller);
-    }
+		c.gridx = 0;
+		c.gridy = y;
 
-    public void setCitaDTO(CitaDTO cita) {
-        this.citaId = cita.getId();
+		contentPanel.add(new JLabel("Descripción:"), c);
 
-        if (cita.getFecha() != null) {
-            Date date = Date.from(cita.getFecha().atZone(ZoneId.systemDefault()).toInstant());
-            dateChooser.setDate(date);
-        }
+		descripcionTF = new JTextField();
 
-        descripcionTF.setText(cita.getDescripcion() != null ? cita.getDescripcion() : "");
+		c.gridx = 1;
 
-        for (int i = 0; i < clienteCB.getItemCount(); i++) {
-            ClienteDTO cl = clienteCB.getItemAt(i);
-            if (cl.getId() != null && cl.getId().equals(cita.getClienteId())) {
-                clienteCB.setSelectedIndex(i);
-                break;
-            }
-        }
+		c.gridwidth = 3;
 
-        for (int i = 0; i < cocheCB.getItemCount(); i++) {
-            CocheDTO co = cocheCB.getItemAt(i);
-            if (co.getId() != null && co.getId().equals(cita.getCocheId())) {
-                cocheCB.setSelectedIndex(i);
-                break;
-            }
-        }
+		contentPanel.add(descripcionTF, c);
 
-        for (int i = 0; i < estadoCB.getItemCount(); i++) {
-            EstadoCita est = estadoCB.getItemAt(i);
-            if (est.getId() != null && est.getId().equals(cita.getEstadoCitaId())) {
-                estadoCB.setSelectedIndex(i);
-                break;
-            }
-        }
+		JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        setEditable(false);
-        setAgreeController(new CitaSetEditableController(this));
-    }
+		add(buttonsPanel, BorderLayout.SOUTH);
+
+		cancelarButton = new JButton("Cancelar");
+
+		guardarButton = new JButton("Guardar");
+
+		buttonsPanel.add(cancelarButton);
+
+		buttonsPanel.add(guardarButton);
+
+		guardarButton.addActionListener(new CitaCreateController(this));
+
+		clienteCB.addActionListener(e -> cargarCoches());
+	}
+
+	private void postInitialize() {
+
+		try {
+
+			clienteCB.setRenderer(new ClienteCBRenderer());
+
+			cocheCB.setRenderer(new CocheCBRenderer());
+
+			cargarClientes();
+
+			inicializarCoches();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			JOptionPane.showMessageDialog(this, "Error cargando datos", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void cargarClientes() throws Exception {
+
+		Results<ClienteDTO> results = clienteService.findByCriteria(new ClienteCriteria(), 1, 1000);
+
+		DefaultComboBoxModel<ClienteDTO> model = new DefaultComboBoxModel<>();
+
+		ClienteDTO placeholder = new ClienteDTO();
+
+		placeholder.setId(null);
+
+		model.addElement(placeholder);
+
+		for (ClienteDTO cliente : results.getPage()) {
+
+			model.addElement(cliente);
+		}
+
+		clienteCB.setModel(model);
+	}
+
+	private void inicializarCoches() {
+
+		DefaultComboBoxModel<CocheDTO> model = new DefaultComboBoxModel<>();
+
+		CocheDTO placeholder = new CocheDTO();
+
+		placeholder.setId(null);
+
+		model.addElement(placeholder);
+
+		cocheCB.setModel(model);
+	}
+
+	private void cargarCoches() {
+
+		ClienteDTO cliente = (ClienteDTO) clienteCB.getSelectedItem();
+
+		DefaultComboBoxModel<CocheDTO> model = new DefaultComboBoxModel<>();
+
+		CocheDTO placeholder = new CocheDTO();
+
+		placeholder.setId(null);
+
+		model.addElement(placeholder);
+
+		try {
+
+			if (cliente != null && cliente.getId() != null) {
+
+				CocheCriteria criteria = new CocheCriteria();
+
+				criteria.setClienteId(cliente.getId());
+
+				Results<CocheDTO> results = cocheService.findByCriteria(criteria, 1, 1000);
+
+				for (CocheDTO coche : results.getPage()) {
+
+					model.addElement(coche);
+				}
+			}
+
+			cocheCB.setModel(model);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			JOptionPane.showMessageDialog(this, "Error cargando coches", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	public Cita getModel() {
+
+		if (dateChooser.getDate() == null) {
+
+			JOptionPane.showMessageDialog(this, "La fecha es obligatoria.", "Error", JOptionPane.ERROR_MESSAGE);
+
+			return null;
+		}
+
+		ClienteDTO cliente = (ClienteDTO) clienteCB.getSelectedItem();
+
+		if (cliente == null || cliente.getId() == null) {
+
+			JOptionPane.showMessageDialog(this, "Debe seleccionar un cliente.", "Error", JOptionPane.ERROR_MESSAGE);
+
+			return null;
+		}
+
+		CocheDTO coche = (CocheDTO) cocheCB.getSelectedItem();
+
+		if (coche == null || coche.getId() == null) {
+
+			JOptionPane.showMessageDialog(this, "Debe seleccionar un coche.", "Error", JOptionPane.ERROR_MESSAGE);
+
+			return null;
+		}
+
+		LocalDateTime fecha = dateChooser.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Cita cita = new Cita();
+
+		cita.setId(citaId);
+
+		cita.setFecha(fecha);
+
+		cita.setDescripcion(descripcionTF.getText().trim());
+
+		cita.setClienteId(cliente.getId());
+
+		cita.setCocheId(coche.getId());
+
+		return cita;
+	}
+
+	public void setCitaDTO(CitaDTO cita) {
+
+		citaId = cita.getId();
+
+		if (cita.getFecha() != null) {
+
+			Date fecha = Date.from(cita.getFecha().atZone(ZoneId.systemDefault()).toInstant());
+
+			dateChooser.setDate(fecha);
+		}
+
+		descripcionTF.setText(cita.getDescripcion());
+
+		for (int i = 0; i < clienteCB.getItemCount(); i++) {
+
+			ClienteDTO cliente = clienteCB.getItemAt(i);
+
+			if (cliente.getId() != null && cliente.getId().equals(cita.getClienteId())) {
+
+				clienteCB.setSelectedIndex(i);
+
+				break;
+			}
+		}
+
+		cargarCoches();
+
+		for (int i = 0; i < cocheCB.getItemCount(); i++) {
+
+			CocheDTO coche = cocheCB.getItemAt(i);
+
+			if (coche.getId() != null && coche.getId().equals(cita.getCocheId())) {
+
+				cocheCB.setSelectedIndex(i);
+
+				break;
+			}
+		}
+
+		setEditable(false);
+
+		setAgreeController(new CitaSetEditableController(this));
+	}
+
+	public void setEditable(boolean editable) {
+
+		dateChooser.setEnabled(editable);
+
+		descripcionTF.setEditable(editable);
+
+		clienteCB.setEnabled(editable);
+
+		cocheCB.setEnabled(editable);
+	}
+
+	public void setAgreeController(Controller controller) {
+
+		guardarButton.setAction(controller);
+	}
+
+	public void setCancelController(Controller controller) {
+
+		cancelarButton.setAction(controller);
+	}
 }
