@@ -2,96 +2,253 @@ package com.paula.checkmycar.desktop.views;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import com.paula.checkmc.model.EstadoPieza;
 import com.paula.checkmc.model.PiezaCriteria;
 import com.paula.checkmc.model.PiezaDTO;
+import com.paula.checkmc.model.Results;
+import com.paula.checkmc.service.EstadoPiezaService;
 import com.paula.checkmc.service.PiezaService;
+import com.paula.checkmc.service.impl.EstadoPiezaServiceImpl;
 import com.paula.checkmc.service.impl.PiezaServiceImpl;
+import com.paula.checkmycar.desktop.controller.PiezaSearchController;
+import com.paula.checkmycar.desktop.views.renderer.EstadoPiezaCBRenderer;
 import com.paula.checkmycar.desktop.views.tableModel.PiezaTableModel;
 
 public class PiezaSearchView extends View {
 
-    private JTextField nombreTF;
+	private JTextField nombreTF;
 
-    private JTable tabla;
-    private PiezaTableModel tableModel;
-    private JLabel totalLabel;
+	private JTextField referenciaTF;
 
-    private PiezaService piezaService = new PiezaServiceImpl();
+	private JComboBox<EstadoPieza> estadoCombo;
 
-    public PiezaSearchView() {
-        initialize();
-        postInitialize();
-    }
+	private JButton buscarButton;
 
-    private void initialize() {
-        setName("Búsqueda de piezas");
-        setLayout(new BorderLayout());
+	private JButton anteriorButton;
 
-        JPanel filtrosPanel = new JPanel(new GridBagLayout());
-        add(filtrosPanel, BorderLayout.NORTH);
+	private JButton siguienteButton;
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(5, 5, 5, 5);
-        c.fill = GridBagConstraints.HORIZONTAL;
+	private JLabel paginaLabel;
 
-        c.gridx = 0; c.gridy = 0; filtrosPanel.add(new JLabel("Nombre:"), c);
-        nombreTF = new JTextField();
-        c.gridx = 1; filtrosPanel.add(nombreTF, c);
+	private JTable table;
 
-        JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        c.gridx = 0; c.gridy = 1; c.gridwidth = 2;
-        filtrosPanel.add(botonesPanel, c);
+	private PiezaTableModel tableModel;
 
-        JButton limpiarButton = new JButton("Limpiar");
-        JButton buscarButton  = new JButton("Buscar");
+	private PiezaService piezaService;
 
-        botonesPanel.add(limpiarButton);
-        botonesPanel.add(buscarButton);
+	private EstadoPiezaService estadoPiezaService;
 
-        limpiarButton.addActionListener(e -> limpiar());
-        buscarButton.addActionListener(e -> buscar());
+	private PiezaSearchController searchController;
 
-        tabla = new JTable();
-        add(new JScrollPane(tabla), BorderLayout.CENTER);
+	private int paginaActual = 1;
 
-        JPanel footer = new JPanel();
-        totalLabel = new JLabel("0 piezas");
-        footer.add(totalLabel);
-        add(footer, BorderLayout.SOUTH);
-    }
+	private static final int PAGE_SIZE = 10;
 
-    private void postInitialize() {
-        tableModel = new PiezaTableModel();
-        tabla.setModel(tableModel);
-    }
+	public PiezaSearchView() {
 
-    private void buscar() {
-        PiezaCriteria criteria = new PiezaCriteria();
+		piezaService = new PiezaServiceImpl();
 
-        String nombre = nombreTF.getText().trim();
-        if (!nombre.isEmpty()) criteria.setNombre(nombre);
+		estadoPiezaService = new EstadoPiezaServiceImpl();
 
-        List<PiezaDTO> resultados = piezaService.findByCriteria(criteria, 1, 1000);
-        tableModel.setData(resultados);
-        totalLabel.setText(resultados.size() + " piezas");
-    }
+		initialize();
 
-    private void limpiar() {
-        nombreTF.setText("");
-        tableModel.setData(new ArrayList<>());
-        totalLabel.setText("0 piezas");
-    }
+		postInitialize();
+	}
+
+	private void initialize() {
+
+		setLayout(new BorderLayout());
+
+		setName("Búsqueda de piezas");
+
+		JPanel filtrosPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+		filtrosPanel.add(new JLabel("Nombre:"));
+
+		nombreTF = new JTextField(15);
+
+		filtrosPanel.add(nombreTF);
+
+		filtrosPanel.add(new JLabel("Referencia:"));
+
+		referenciaTF = new JTextField(15);
+
+		filtrosPanel.add(referenciaTF);
+
+		filtrosPanel.add(new JLabel("Estado:"));
+
+		estadoCombo = new JComboBox<>();
+
+		filtrosPanel.add(estadoCombo);
+
+		buscarButton = new JButton("Buscar");
+
+		filtrosPanel.add(buscarButton);
+
+		JButton limpiarButton = new JButton("Limpiar");
+
+		filtrosPanel.add(limpiarButton);
+
+		add(filtrosPanel, BorderLayout.NORTH);
+
+		tableModel = new PiezaTableModel();
+
+		table = new JTable(tableModel);
+
+		JScrollPane scrollPane = new JScrollPane(table);
+
+		add(scrollPane, BorderLayout.CENTER);
+
+		JPanel paginacionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+		anteriorButton = new JButton("Anterior");
+
+		siguienteButton = new JButton("Siguiente");
+
+		paginaLabel = new JLabel("Página 1");
+
+		paginacionPanel.add(anteriorButton);
+
+		paginacionPanel.add(paginaLabel);
+
+		paginacionPanel.add(siguienteButton);
+
+		add(paginacionPanel, BorderLayout.SOUTH);
+	}
+
+	private void postInitialize() {
+
+		estadoCombo.setRenderer(new EstadoPiezaCBRenderer());
+
+		cargarEstados();
+
+		searchController = new PiezaSearchController(this);
+
+		buscarButton.addActionListener(searchController);
+
+		anteriorButton.addActionListener(e -> {
+
+			if (paginaActual > 1) {
+
+				paginaActual--;
+
+				searchController.buscar(paginaActual);
+			}
+		});
+
+		siguienteButton.addActionListener(e -> {
+
+			paginaActual++;
+
+			searchController.buscar(paginaActual);
+		});
+
+		try {
+
+			buscar(1);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+	}
+
+	private void cargarEstados() {
+
+		try {
+
+			DefaultComboBoxModel<EstadoPieza> model = new DefaultComboBoxModel<>();
+
+			EstadoPieza estadoDefault = new EstadoPieza();
+
+			estadoDefault.setId(null);
+
+			estadoDefault.setNombre("Todos");
+
+			model.addElement(estadoDefault);
+
+			List<EstadoPieza> estados = estadoPiezaService.findAll();
+
+			for (EstadoPieza estado : estados) {
+
+				model.addElement(estado);
+			}
+
+			estadoCombo.setModel(model);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			JOptionPane.showMessageDialog(this, "Error cargando estados");
+		}
+	}
+
+	public void buscar() throws Exception {
+
+		buscar(1);
+	}
+
+	public void buscar(int pagina) throws Exception {
+
+		paginaActual = pagina;
+
+		PiezaCriteria criteria = new PiezaCriteria();
+
+		criteria.setNombre(nombreTF.getText());
+
+		criteria.setNumeroReferencia(referenciaTF.getText());
+
+		EstadoPieza estado = (EstadoPieza) estadoCombo.getSelectedItem();
+
+		if (estado != null && estado.getId() != null) {
+
+			criteria.setEstadoId(estado.getId());
+		}
+
+		Results<PiezaDTO> results = piezaService.findByCriteria(criteria, pagina, PAGE_SIZE);
+
+		List<PiezaDTO> piezas = results.getPage();
+
+		tableModel.setPiezas(piezas);
+
+		tableModel.fireTableDataChanged();
+
+		actualizarPaginacion(pagina, PAGE_SIZE, results.getTotal());
+	}
+
+	public void actualizarPaginacion(int pagina, int pageSize, int total) {
+
+		paginaActual = pagina;
+
+		int totalPaginas = total / pageSize;
+
+		if (total % pageSize != 0) {
+
+			totalPaginas++;
+		}
+
+		if (totalPaginas < 1) {
+
+			totalPaginas = 1;
+		}
+
+		paginaLabel.setText("Página " + paginaActual + " de " + totalPaginas);
+
+		anteriorButton.setEnabled(paginaActual > 1);
+
+		siguienteButton.setEnabled(paginaActual < totalPaginas);
+	}
 }
