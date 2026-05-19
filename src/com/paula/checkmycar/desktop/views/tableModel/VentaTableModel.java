@@ -3,7 +3,9 @@ package com.paula.checkmycar.desktop.views.tableModel;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.table.AbstractTableModel;
+
 import com.paula.checkmc.model.VentaDTO;
 
 public class VentaTableModel extends AbstractTableModel {
@@ -64,4 +66,9 @@ public class VentaTableModel extends AbstractTableModel {
     public VentaDTO getVentaAt(int row) {
         return data.get(row);
     }
+
+	public void setVentas(List<VentaDTO> ventas) {
+		// TODO Auto-generated method stub
+		
+	}
 }

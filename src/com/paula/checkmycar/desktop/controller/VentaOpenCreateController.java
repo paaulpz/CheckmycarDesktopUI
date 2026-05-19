@@ -9,13 +9,16 @@ import com.paula.checkmycar.desktop.views.VentaCreateView;
 
 public class VentaOpenCreateController extends AbstractAction {
 
-    public VentaOpenCreateController() {
-        super("Nueva venta");
-    }
+	public VentaOpenCreateController() {
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        VentaCreateView view = new VentaCreateView();
-        CheckmycarWindow.getInstance().addView(view.getName(), view);
-    }
+		super("Nueva venta");
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+		VentaCreateView view = new VentaCreateView();
+
+		CheckmycarWindow.getInstance().addView(view.getName(), view);
+	}
 }
