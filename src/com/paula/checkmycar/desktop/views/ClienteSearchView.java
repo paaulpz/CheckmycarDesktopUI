@@ -24,206 +24,216 @@ import com.paula.checkmc.model.ClienteDTO;
 import com.paula.checkmycar.desktop.controller.ClienteSearchController;
 import com.paula.checkmycar.desktop.views.renderer.ClienteEmpleadoButtonRenderer;
 import com.paula.checkmycar.desktop.views.tableModel.ClienteTableModel;
-import com.paula.checkmycar.desktop.views.tableModel.editor.ClienteButtonEditor;
+import com.paula.checkmycar.desktop.views.tableModel.editor.ClienteEmpleadoButtonEditor;
 
 public class ClienteSearchView extends View {
 
-    private JTextField dniTF;
-    private JTextField emailTF;
-    private JTable table;
-    private ClienteTableModel tableModel;
-    
-    private JButton anteriorButton;
-    private JButton siguienteButton;
-    private JLabel paginaLabel;
-    private int paginaActual = 1;
-    private ClienteSearchController searchController;
+	private JTextField dniTF;
+	private JTextField emailTF;
+	private JTable table;
+	private ClienteTableModel tableModel;
 
-    public ClienteSearchView() {
-        initialize();
-        postInitialize();
-    }
+	private JButton anteriorButton;
+	private JButton siguienteButton;
+	private JLabel paginaLabel;
+	private int paginaActual = 1;
+	private ClienteSearchController searchController;
 
-    private void initialize() {
-        setName("Búsqueda de clientes");
-        setLayout(new BorderLayout(0, 0));
+	public ClienteSearchView() {
+		initialize();
+		postInitialize();
+	}
 
-        JPanel criteriosPanel = new JPanel();
-        add(criteriosPanel, BorderLayout.NORTH);
-        GridBagLayout gbl_criteriosPanel = new GridBagLayout();
-        gbl_criteriosPanel.columnWidths = new int[] { 41, 86, 0, 8, 0, 46, 86, 1, 5, 49, 0 };
-        gbl_criteriosPanel.rowHeights = new int[] { 25, 20, 0, 0, 0, 0 };
-        gbl_criteriosPanel.columnWeights = new double[] { 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                Double.MIN_VALUE };
-        gbl_criteriosPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
-        criteriosPanel.setLayout(gbl_criteriosPanel);
+	private void initialize() {
+		setName("Búsqueda de clientes");
+		setLayout(new BorderLayout(0, 0));
 
-        JLabel dniLabel = new JLabel("DNI/NIE:");
-        GridBagConstraints gbc_dniLabel = new GridBagConstraints();
-        gbc_dniLabel.anchor = GridBagConstraints.EAST;
-        gbc_dniLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_dniLabel.gridx = 0;
-        gbc_dniLabel.gridy = 1;
-        criteriosPanel.add(dniLabel, gbc_dniLabel);
+		JPanel criteriosPanel = new JPanel();
+		add(criteriosPanel, BorderLayout.NORTH);
+		GridBagLayout gbl_criteriosPanel = new GridBagLayout();
+		gbl_criteriosPanel.columnWidths = new int[] { 41, 86, 0, 8, 0, 46, 86, 1, 5, 49, 0 };
+		gbl_criteriosPanel.rowHeights = new int[] { 25, 20, 0, 0, 0, 0 };
+		gbl_criteriosPanel.columnWeights = new double[] { 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+				Double.MIN_VALUE };
+		gbl_criteriosPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		criteriosPanel.setLayout(gbl_criteriosPanel);
 
-        dniTF = new JTextField();
-        dniTF.setColumns(10);
-        GridBagConstraints gbc_dniTF = new GridBagConstraints();
-        gbc_dniTF.gridwidth = 2;
-        gbc_dniTF.insets = new Insets(0, 0, 5, 5);
-        gbc_dniTF.fill = GridBagConstraints.HORIZONTAL;
-        gbc_dniTF.gridx = 1;
-        gbc_dniTF.gridy = 1;
-        criteriosPanel.add(dniTF, gbc_dniTF);
+		JLabel dniLabel = new JLabel("DNI/NIE:");
+		GridBagConstraints gbc_dniLabel = new GridBagConstraints();
+		gbc_dniLabel.anchor = GridBagConstraints.EAST;
+		gbc_dniLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_dniLabel.gridx = 0;
+		gbc_dniLabel.gridy = 1;
+		criteriosPanel.add(dniLabel, gbc_dniLabel);
 
-        JLabel emailLabel = new JLabel("Email:");
-        GridBagConstraints gbc_emailLabel = new GridBagConstraints();
-        gbc_emailLabel.anchor = GridBagConstraints.EAST;
-        gbc_emailLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_emailLabel.gridx = 5;
-        gbc_emailLabel.gridy = 1;
-        criteriosPanel.add(emailLabel, gbc_emailLabel);
+		dniTF = new JTextField();
+		dniTF.setColumns(10);
+		GridBagConstraints gbc_dniTF = new GridBagConstraints();
+		gbc_dniTF.gridwidth = 2;
+		gbc_dniTF.insets = new Insets(0, 0, 5, 5);
+		gbc_dniTF.fill = GridBagConstraints.HORIZONTAL;
+		gbc_dniTF.gridx = 1;
+		gbc_dniTF.gridy = 1;
+		criteriosPanel.add(dniTF, gbc_dniTF);
 
-        emailTF = new JTextField();
-        emailTF.setColumns(10);
-        GridBagConstraints gbc_emailTF = new GridBagConstraints();
-        gbc_emailTF.gridwidth = 4;
-        gbc_emailTF.insets = new Insets(0, 0, 5, 0);
-        gbc_emailTF.fill = GridBagConstraints.HORIZONTAL;
-        gbc_emailTF.gridx = 6;
-        gbc_emailTF.gridy = 1;
-        criteriosPanel.add(emailTF, gbc_emailTF);
+		JLabel emailLabel = new JLabel("Email:");
+		GridBagConstraints gbc_emailLabel = new GridBagConstraints();
+		gbc_emailLabel.anchor = GridBagConstraints.EAST;
+		gbc_emailLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_emailLabel.gridx = 5;
+		gbc_emailLabel.gridy = 1;
+		criteriosPanel.add(emailLabel, gbc_emailLabel);
 
-        JPanel panel = new JPanel();
-        FlowLayout flowLayout = (FlowLayout) panel.getLayout();
-        flowLayout.setAlignment(FlowLayout.RIGHT);
-        GridBagConstraints gbc_panel = new GridBagConstraints();
-        gbc_panel.gridwidth = 10;
-        gbc_panel.fill = GridBagConstraints.BOTH;
-        gbc_panel.gridx = 0;
-        gbc_panel.gridy = 4;
-        criteriosPanel.add(panel, gbc_panel);
+		emailTF = new JTextField();
+		emailTF.setColumns(10);
+		GridBagConstraints gbc_emailTF = new GridBagConstraints();
+		gbc_emailTF.gridwidth = 4;
+		gbc_emailTF.insets = new Insets(0, 0, 5, 0);
+		gbc_emailTF.fill = GridBagConstraints.HORIZONTAL;
+		gbc_emailTF.gridx = 6;
+		gbc_emailTF.gridy = 1;
+		criteriosPanel.add(emailTF, gbc_emailTF);
 
-        JButton limpiarButton = new JButton("Limpiar");
-        limpiarButton.setIcon(new ImageIcon(ClienteSearchView.class.getResource("/icons/16x16/basura.png")));
-        limpiarButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dniTF.setText("");
-                emailTF.setText("");
-                tableModel.setClientes(new ArrayList<>());
-            }
-        });
-        panel.add(limpiarButton);
+		JPanel panel = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) panel.getLayout();
+		flowLayout.setAlignment(FlowLayout.RIGHT);
+		GridBagConstraints gbc_panel = new GridBagConstraints();
+		gbc_panel.gridwidth = 10;
+		gbc_panel.fill = GridBagConstraints.BOTH;
+		gbc_panel.gridx = 0;
+		gbc_panel.gridy = 4;
+		criteriosPanel.add(panel, gbc_panel);
 
-        JButton buscarButton = new JButton("Buscar");
-        buscarButton.addActionListener(e -> searchController.buscar(1));
-        buscarButton.setIcon(new ImageIcon(ClienteSearchView.class.getResource("/nuvola/16x16/1339_kmag_kmag.png")));
-        panel.add(buscarButton);
+		JButton limpiarButton = new JButton("Limpiar");
+		limpiarButton.setIcon(new ImageIcon(ClienteSearchView.class.getResource("/icons/16x16/basura.png")));
+		limpiarButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dniTF.setText("");
+				emailTF.setText("");
+				tableModel.setClientes(new ArrayList<>());
+			}
+		});
+		panel.add(limpiarButton);
 
-        JPanel resultadosPanel = new JPanel();
-        add(resultadosPanel, BorderLayout.CENTER);
-        resultadosPanel.setLayout(new BorderLayout(0, 0));
+		JButton buscarButton = new JButton("Buscar");
+		buscarButton.addActionListener(e -> searchController.buscar(1));
+		buscarButton.setIcon(new ImageIcon(ClienteSearchView.class.getResource("/nuvola/16x16/1339_kmag_kmag.png")));
+		panel.add(buscarButton);
 
-        table = new JTable();
+		JPanel resultadosPanel = new JPanel();
+		add(resultadosPanel, BorderLayout.CENTER);
+		resultadosPanel.setLayout(new BorderLayout(0, 0));
 
-        JScrollPane scrollPane = new JScrollPane(table);
-        resultadosPanel.add(scrollPane, BorderLayout.CENTER);
-        
-        JPanel paginacionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        add(paginacionPanel, BorderLayout.SOUTH);
+		table = new JTable();
 
-        anteriorButton = new JButton("◀ Anterior");
-        paginaLabel = new JLabel("Página 1");
-        siguienteButton = new JButton("Siguiente ▶");
+		JScrollPane scrollPane = new JScrollPane(table);
+		resultadosPanel.add(scrollPane, BorderLayout.CENTER);
 
-        paginacionPanel.add(anteriorButton);
-        paginacionPanel.add(paginaLabel);
-        paginacionPanel.add(siguienteButton);
+		JPanel paginacionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		add(paginacionPanel, BorderLayout.SOUTH);
 
-        anteriorButton.setEnabled(false);
-        siguienteButton.setEnabled(false);
+		anteriorButton = new JButton("◀ Anterior");
+		paginaLabel = new JLabel("Página 1");
+		siguienteButton = new JButton("Siguiente ▶");
 
-        
-    }
+		paginacionPanel.add(anteriorButton);
+		paginacionPanel.add(paginaLabel);
+		paginacionPanel.add(siguienteButton);
 
-    private void postInitialize() {
+		anteriorButton.setEnabled(false);
+		siguienteButton.setEnabled(false);
 
-        tableModel = new ClienteTableModel();
-        table.setModel(tableModel);
+	}
 
-        table.setRowHeight(30);
+	private void postInitialize() {
 
-        table.getColumnModel()
-                .getColumn(4)
-                .setCellRenderer(new ClienteEmpleadoButtonRenderer());
+		tableModel = new ClienteTableModel();
+		table.setModel(tableModel);
 
-        table.getColumnModel()
-                .getColumn(4)
-                .setCellEditor(new ClienteButtonEditor(new JCheckBox()));
+		table.setRowHeight(30);
 
-        table.setSurrendersFocusOnKeystroke(true);
-        table.setCellSelectionEnabled(true);
+		table.getColumnModel().getColumn(4).setCellRenderer(new ClienteEmpleadoButtonRenderer());
 
-        table.addMouseListener(new java.awt.event.MouseAdapter() {
+		table.getColumnModel().getColumn(4).setCellEditor(new ClienteEmpleadoButtonEditor(new JCheckBox()));
 
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
+		table.setSurrendersFocusOnKeystroke(true);
+		table.setCellSelectionEnabled(true);
 
-                int row = table.rowAtPoint(e.getPoint());
-                int col = table.columnAtPoint(e.getPoint());
+		table.addMouseListener(new java.awt.event.MouseAdapter() {
 
-                if (col == 4) {
+			@Override
+			public void mouseClicked(java.awt.event.MouseEvent e) {
 
-                    table.editCellAt(row, col);
+				int row = table.rowAtPoint(e.getPoint());
+				int col = table.columnAtPoint(e.getPoint());
 
-                    Component editor = table.getEditorComponent();
+				if (col == 4) {
 
-                    if (editor != null) {
-                        editor.requestFocus();
-                    }
-                }
-            }
-        });
+					table.editCellAt(row, col);
 
-        searchController = new ClienteSearchController(this);
+					Component editor = table.getEditorComponent();
 
-        anteriorButton.addActionListener(e -> {
+					if (editor != null) {
+						editor.requestFocus();
+					}
+				}
+			}
+		});
 
-            if (paginaActual > 1) {
-                searchController.buscar(--paginaActual);
-            }
-        });
+		searchController = new ClienteSearchController(this);
 
-        siguienteButton.addActionListener(e -> {
-            searchController.buscar(++paginaActual);
-        });
-    }
-    public void actualizarPaginacion(int pagina, int pageSize, int total) {
-        this.paginaActual = pagina;
-        int totalPaginas = (int) Math.ceil((double) total / pageSize);
-        if (totalPaginas == 0) totalPaginas = 1;
-        paginaLabel.setText("Página " + pagina + " de " + totalPaginas);
-        anteriorButton.setEnabled(pagina > 1);
-        siguienteButton.setEnabled(pagina < totalPaginas);
-    }
-    
+		anteriorButton.addActionListener(e -> {
 
-    public String getDni() {
-        return dniTF.getText();
-    }
+			if (paginaActual > 1) {
+				searchController.buscar(--paginaActual);
+			}
+		});
 
-    public String getEmail() {
-        return emailTF.getText();
-    }
+		siguienteButton.addActionListener(e -> {
+			searchController.buscar(++paginaActual);
+		});
+	}
 
-    public void setTableData(List<ClienteDTO> clientes) {
-        tableModel.setClientes(clientes);
-    }
+	public void actualizarPaginacion(int pagina, int pageSize, int total) {
 
-    public ClienteDTO getSelectedCliente() {
-        int fila = table.getSelectedRow();
-        if (fila == -1) return null;
+		paginaActual = pagina;
 
-        return tableModel.getClienteAt(fila);
-    }
+		int totalPaginas = total / pageSize;
+
+		if (total % pageSize != 0) {
+
+			totalPaginas++;
+		}
+
+		if (totalPaginas < 1) {
+
+			totalPaginas = 1;
+		}
+
+		paginaLabel.setText("Página " + paginaActual + " de " + totalPaginas);
+
+		anteriorButton.setEnabled(paginaActual > 1);
+
+		siguienteButton.setEnabled(paginaActual < totalPaginas);
+	}
+
+	public String getDni() {
+		return dniTF.getText();
+	}
+
+	public String getEmail() {
+		return emailTF.getText();
+	}
+
+	public void setTableData(List<ClienteDTO> clientes) {
+		tableModel.setClientes(clientes);
+	}
+
+	public ClienteDTO getSelectedCliente() {
+		int fila = table.getSelectedRow();
+		if (fila == -1)
+			return null;
+
+		return tableModel.getClienteAt(fila);
+	}
 }
