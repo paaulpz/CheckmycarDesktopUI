@@ -45,10 +45,11 @@ public class ClienteCreateController extends Controller {
 
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(view,
-                "Error al crear el cliente : dni invalido",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+            	    view,
+            	    e.getMessage(),
+            	    "Error",
+            	    JOptionPane.ERROR_MESSAGE);
         }
     }
 
