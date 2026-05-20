@@ -157,7 +157,6 @@ public class PiezaSearchView extends View {
 
 		try {
 
-			buscar(1);
 
 		} catch (Exception e) {
 

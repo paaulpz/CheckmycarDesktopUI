@@ -165,7 +165,7 @@ public class LineaPresupuestoCreateView extends JDialog {
 
 	private void cargarPiezas() throws Exception {
 
-		Results<PiezaDTO> results = piezaService.findByCriteria(new PiezaCriteria(), 1, 10);
+		Results<PiezaDTO> results = piezaService.findByCriteria(new PiezaCriteria(), 1, 1000);
 
 		List<PiezaDTO> piezas = results.getPage();
 
