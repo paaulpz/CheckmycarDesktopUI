@@ -23,7 +23,7 @@ import com.paula.checkmycar.desktop.controller.Controller;
 import com.paula.checkmycar.desktop.views.ClienteCreateView;
 import com.paula.checkmycar.desktop.views.tableModel.ClienteTableModel;
 
-public class ClienteEmpleadoButtonEditor extends AbstractCellEditor implements TableCellEditor {
+public class ClienteButtonEditor extends AbstractCellEditor implements TableCellEditor {
 
 	private JPanel panel;
 	private JButton editarButton;
@@ -32,15 +32,15 @@ public class ClienteEmpleadoButtonEditor extends AbstractCellEditor implements T
 	private JTable tabla;
 	private ClienteService clienteService = new ClienteServiceImpl();
 
-	public ClienteEmpleadoButtonEditor(JCheckBox checkBox) {
+	public ClienteButtonEditor(JCheckBox checkBox) {
 
 		panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 0));
 
 		editarButton = new JButton();
-		editarButton.setIcon(new ImageIcon(ClienteEmpleadoButtonEditor.class.getResource("/icons/16x16/usuarioedit.png")));
+		editarButton.setIcon(new ImageIcon(ClienteButtonEditor.class.getResource("/icons/16x16/usuarioedit.png")));
 
 		eliminarButton = new JButton();
-		eliminarButton.setIcon(new ImageIcon(ClienteEmpleadoButtonEditor.class.getResource("/icons/16x16/basura.png")));
+		eliminarButton.setIcon(new ImageIcon(ClienteButtonEditor.class.getResource("/icons/16x16/basura.png")));
 
 		panel.add(editarButton);
 		panel.add(eliminarButton);

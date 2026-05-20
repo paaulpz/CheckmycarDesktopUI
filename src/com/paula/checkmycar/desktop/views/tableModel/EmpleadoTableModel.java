@@ -57,6 +57,8 @@ public class EmpleadoTableModel extends AbstractTableModel {
         return datos; 
     }
     
+
+    
     @Override
     public boolean isCellEditable(
             int rowIndex,

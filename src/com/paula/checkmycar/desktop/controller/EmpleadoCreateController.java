@@ -12,51 +12,48 @@ import com.paula.checkmycar.desktop.views.EmpleadoCreateView;
 
 public class EmpleadoCreateController extends Controller {
 
-    private EmpleadoCreateView view;
-    private EmpleadoService empleadoService;
+	private EmpleadoCreateView view;
+	private EmpleadoService empleadoService;
 
-    public EmpleadoCreateController(EmpleadoCreateView view) {
+	public EmpleadoCreateController(EmpleadoCreateView view) {
 
-        super(view, "Guardar",
-                new ImageIcon(EmpleadoCreateController.class.getResource("/icons/16x16/agregarusuario.png")));
+		super(view, "Guardar",
+				new ImageIcon(EmpleadoCreateController.class.getResource("/icons/16x16/agregarusuario.png")));
 
-        this.view = view;
-        this.empleadoService = new EmpleadoServiceImpl();
-    }
+		this.view = view;
+		this.empleadoService = new EmpleadoServiceImpl();
+	}
 
-    @Override
-    public void doAction() {
+	@Override
+	public void doAction() {
 
-        Empleado empleado = (Empleado) view.getModel();
+		Empleado empleado = (Empleado) view.getModel();
 
-        if (empleado == null) return;
+		if (empleado == null)
+			return;
 
-        try {
+		try {
 
-            empleadoService.register(empleado);
+		
 
-            JOptionPane.showMessageDialog(view,
-                    "Empleado creado correctamente",
-                    "Éxito",
-                    JOptionPane.INFORMATION_MESSAGE);
+			empleadoService.create(empleado);
+			JOptionPane.showMessageDialog(view, "Empleado creado correctamente", "Éxito",
+					JOptionPane.INFORMATION_MESSAGE);
 
-            view.setEditable(false);
+			view.setEditable(false);
 
-            view.setAgreeController(new EmpleadoSetEditableController(view));
+			view.setAgreeController(new EmpleadoSetEditableController(view));
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 
-            e.printStackTrace();
+			e.printStackTrace();
 
-            JOptionPane.showMessageDialog(view,
-                    "Error al crear el empleado",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
+			JOptionPane.showMessageDialog(view, "Error al crear el empleado", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        doAction();
-    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		doAction();
+	}
 }

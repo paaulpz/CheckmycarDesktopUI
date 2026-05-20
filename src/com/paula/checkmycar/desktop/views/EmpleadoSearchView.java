@@ -27,9 +27,9 @@ import com.paula.checkmc.model.Rol;
 import com.paula.checkmc.service.RolService;
 import com.paula.checkmc.service.impl.RolServiceImpl;
 import com.paula.checkmycar.desktop.controller.EmpleadoSearchController;
-import com.paula.checkmycar.desktop.views.renderer.ClienteEmpleadoButtonRenderer;
+import com.paula.checkmycar.desktop.views.renderer.EmpleadoButtonRenderer;
 import com.paula.checkmycar.desktop.views.tableModel.EmpleadoTableModel;
-import com.paula.checkmycar.desktop.views.tableModel.editor.ClienteEmpleadoButtonEditor;
+import com.paula.checkmycar.desktop.views.tableModel.editor.EmpleadoButtonEditor;
 
 public class EmpleadoSearchView extends View {
 
@@ -233,9 +233,9 @@ public class EmpleadoSearchView extends View {
 				searchController.buscar(paginaActual + 1);
 			});
 
-			tabla.getColumn("Acciones").setCellRenderer(new ClienteEmpleadoButtonRenderer());
+			tabla.getColumn("Acciones").setCellRenderer(new EmpleadoButtonRenderer());
 
-			tabla.getColumn("Acciones").setCellEditor(new ClienteEmpleadoButtonEditor(new JCheckBox()));
+			tabla.getColumn("Acciones").setCellEditor(new EmpleadoButtonEditor(new JCheckBox()));
 		} catch (Exception e) {
 
 			e.printStackTrace();

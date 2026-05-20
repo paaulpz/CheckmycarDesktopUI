@@ -24,7 +24,7 @@ import com.paula.checkmc.model.ClienteDTO;
 import com.paula.checkmycar.desktop.controller.ClienteSearchController;
 import com.paula.checkmycar.desktop.views.renderer.ClienteEmpleadoButtonRenderer;
 import com.paula.checkmycar.desktop.views.tableModel.ClienteTableModel;
-import com.paula.checkmycar.desktop.views.tableModel.editor.ClienteEmpleadoButtonEditor;
+import com.paula.checkmycar.desktop.views.tableModel.editor.ClienteButtonEditor;
 
 public class ClienteSearchView extends View {
 
@@ -154,7 +154,7 @@ public class ClienteSearchView extends View {
 
 		table.getColumnModel().getColumn(4).setCellRenderer(new ClienteEmpleadoButtonRenderer());
 
-		table.getColumnModel().getColumn(4).setCellEditor(new ClienteEmpleadoButtonEditor(new JCheckBox()));
+		table.getColumnModel().getColumn(4).setCellEditor(new ClienteButtonEditor(new JCheckBox()));
 
 		table.setSurrendersFocusOnKeystroke(true);
 		table.setCellSelectionEnabled(true);
