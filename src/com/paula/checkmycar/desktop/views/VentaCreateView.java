@@ -35,7 +35,6 @@ import com.paula.checkmc.service.impl.ClienteServiceImpl;
 import com.paula.checkmc.service.impl.CocheServiceImpl;
 import com.paula.checkmc.service.impl.EmpleadoServiceImpl;
 import com.paula.checkmc.service.impl.VentaServiceImpl;
-import com.paula.checkmycar.desktop.controller.Controller;
 import com.toedter.calendar.JDateChooser;
 
 public class VentaCreateView extends View {
@@ -82,7 +81,6 @@ public class VentaCreateView extends View {
 
 		y++;
 
-
 		GridBagConstraints gbcFechaLabel = new GridBagConstraints();
 
 		gbcFechaLabel.insets = new Insets(5, 5, 5, 5);
@@ -114,7 +112,6 @@ public class VentaCreateView extends View {
 
 		formPanel.add(dateChooser, gbcFechaChooser);
 
-
 		GridBagConstraints gbcEmpleadoLabel = new GridBagConstraints();
 
 		gbcEmpleadoLabel.insets = new Insets(5, 5, 5, 5);
@@ -143,7 +140,6 @@ public class VentaCreateView extends View {
 		gbcEmpleadoCB.gridy = 1;
 
 		formPanel.add(empleadoCB, gbcEmpleadoCB);
-
 
 		GridBagConstraints gbcVendedorLabel = new GridBagConstraints();
 
@@ -174,7 +170,6 @@ public class VentaCreateView extends View {
 
 		formPanel.add(vendedorCB, gbcVendedorCB);
 
-
 		GridBagConstraints gbcCocheLabel = new GridBagConstraints();
 
 		gbcCocheLabel.insets = new Insets(5, 15, 5, 5);
@@ -203,7 +198,6 @@ public class VentaCreateView extends View {
 		gbcCocheCB.gridy = 3;
 
 		formPanel.add(cocheCB, gbcCocheCB);
-
 
 		GridBagConstraints gbcCompradorLabel = new GridBagConstraints();
 
@@ -234,7 +228,6 @@ public class VentaCreateView extends View {
 
 		formPanel.add(compradorCB, gbcCompradorCB);
 
-
 		GridBagConstraints gbcPrecioFinalLabel = new GridBagConstraints();
 
 		gbcPrecioFinalLabel.insets = new Insets(5, 5, 0, 5);
@@ -262,7 +255,6 @@ public class VentaCreateView extends View {
 		gbcPrecioFinalTF.gridy = 5;
 
 		formPanel.add(precioFinalTF, gbcPrecioFinalTF);
-
 
 		GridBagConstraints gbcPrecioClienteLabel = new GridBagConstraints();
 
@@ -292,7 +284,6 @@ public class VentaCreateView extends View {
 		gbcPrecioClienteTF.gridy = 5;
 
 		formPanel.add(precioClienteTF, gbcPrecioClienteTF);
-
 
 		JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
@@ -594,48 +585,76 @@ public class VentaCreateView extends View {
 	}
 
 	public void setVentaDTO(VentaDTO venta) {
+
 		this.ventaId = venta.getId();
 
 		if (venta.getFechaVenta() != null) {
+
 			java.util.Date date = java.util.Date
 					.from(venta.getFechaVenta().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+
 			dateChooser.setDate(date);
 		}
 
-		if (venta.getPrecioCliente() != null)
+		if (venta.getPrecioCliente() != null) {
+
 			precioClienteTF.setText(String.valueOf(venta.getPrecioCliente()));
+		}
 
-		if (venta.getPrecioFinal() != null)
+		if (venta.getPrecioFinal() != null) {
+
 			precioFinalTF.setText(String.valueOf(venta.getPrecioFinal()));
-
-		for (int i = 0; i < cocheCB.getItemCount(); i++) {
-			CocheDTO co = cocheCB.getItemAt(i);
-			if (co.getId() != null && co.getId().equals(venta.getCocheId())) {
-				cocheCB.setSelectedIndex(i);
-				break;
-			}
 		}
 
 		for (int i = 0; i < compradorCB.getItemCount(); i++) {
+
 			ClienteDTO cl = compradorCB.getItemAt(i);
+
 			if (cl.getId() != null && cl.getId().equals(venta.getClienteCompradorId())) {
+
 				compradorCB.setSelectedIndex(i);
+
 				break;
 			}
 		}
 
 		for (int i = 0; i < vendedorCB.getItemCount(); i++) {
+
 			ClienteDTO cl = vendedorCB.getItemAt(i);
+
 			if (cl.getId() != null && cl.getId().equals(venta.getClienteVendedorId())) {
+
 				vendedorCB.setSelectedIndex(i);
+
+				break;
+			}
+		}
+
+		if (venta.getClienteVendedorId() != null) {
+
+			cargarCochesCliente(venta.getClienteVendedorId());
+		}
+
+		for (int i = 0; i < cocheCB.getItemCount(); i++) {
+
+			CocheDTO co = cocheCB.getItemAt(i);
+
+			if (co.getId() != null && co.getId().equals(venta.getCocheId())) {
+
+				cocheCB.setSelectedIndex(i);
+
 				break;
 			}
 		}
 
 		for (int i = 0; i < empleadoCB.getItemCount(); i++) {
+
 			EmpleadoDTO emp = empleadoCB.getItemAt(i);
+
 			if (emp.getId() != null && emp.getId().equals(venta.getEmpleadoId())) {
+
 				empleadoCB.setSelectedIndex(i);
+
 				break;
 			}
 		}
@@ -710,9 +729,19 @@ public class VentaCreateView extends View {
 		precioFinalTF.setEditable(editable);
 	}
 
-	public void setAgreeController(Controller controller) {
+	public void setAgreeController(ActionListener controller) {
 
-		guardarButton.setAction(controller);
+		for (ActionListener listener : guardarButton.getActionListeners()) {
+
+			guardarButton.removeActionListener(listener);
+		}
+
+		guardarButton.addActionListener(controller);
+	}
+
+	public JButton getGuardarButton() {
+
+		return guardarButton;
 	}
 
 }

@@ -31,7 +31,7 @@ import com.paula.checkmycar.desktop.controller.OpenHomeViewController;
 import com.paula.checkmycar.desktop.controller.OrdenTrabajoOpenMenuController;
 import com.paula.checkmycar.desktop.controller.PiezaOpenMenuController;
 import com.paula.checkmycar.desktop.controller.PresupuestoOpenMenuController;
-import com.paula.checkmycar.desktop.controller.VentasOpenMenuController;
+import com.paula.checkmycar.desktop.controller.VentaOpenMenuController;
 import com.paula.checkmycar.desktop.views.View;
 
 /*
@@ -308,7 +308,7 @@ public class CheckmycarWindow {
 		loginButton.addActionListener(new LogoutController());
 		citaButton.addActionListener(new CitasOpenMenuController(citaButton));
 		piezaButton.addActionListener(new PiezaOpenMenuController(piezaButton));
-		ventasButton.addActionListener(new VentasOpenMenuController(ventasButton));
+		ventasButton.addActionListener(new VentaOpenMenuController(ventasButton));
 		ordenButton.addActionListener(new OrdenTrabajoOpenMenuController(ordenButton));
 		presupuestoButton.addActionListener(new PresupuestoOpenMenuController(presupuestoButton));
 
