@@ -74,9 +74,11 @@ public class CheckmycarWindow {
 
 					UIManager.setLookAndFeel("com.formdev.flatlaf.themes.FlatMacLightLaf");
 
-					LoginWindow login = new LoginWindow();
-
-					login.setVisible(true);
+					CheckmycarWindow window = CheckmycarWindow.getInstance();
+					window.frame.setVisible(true);
+					// Al iniciar la aplicación, se muestra la ventana de login
+					// LoginWindow login = new LoginWindow();
+					// login.setVisible(true);
 
 				} catch (Exception e) {
 

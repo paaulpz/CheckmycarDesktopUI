@@ -50,6 +50,9 @@ public class LoginController implements ActionListener {
 			String dni = view.getDni();
 
 			String password = view.getPassword();
+			
+			System.out.println("DNI=[" + dni + "]");
+			System.out.println("PASSWORD=[" + password + "]");
 
 			if (dni == null || dni.trim().isEmpty() || password == null || password.trim().isEmpty()) {
 
