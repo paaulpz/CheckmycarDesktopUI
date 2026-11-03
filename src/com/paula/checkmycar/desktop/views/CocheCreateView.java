@@ -1,6 +1,7 @@
 package com.paula.checkmycar.desktop.views;
 
 import java.awt.BorderLayout;
+
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -50,6 +51,14 @@ import com.paula.checkmycar.desktop.views.renderer.TipoCombustibleCBRenderer;
 import com.paula.checkmycar.desktop.views.renderer.TipoMotorCBRenderer;
 import com.paula.checkmycar.desktop.views.renderer.TipoTransmisionCBRender;
 
+
+
+import java.io.File;
+import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 public class CocheCreateView extends View {
 
 	private JTextField matriculaTF;
@@ -67,6 +76,11 @@ public class CocheCreateView extends View {
 	private JComboBox<TipoMotor> motorCB;
 	private JComboBox<TipoTransmision> transmisionCB;
 
+	
+	private JButton fotoButton;
+	private JLabel fotoPreview;
+	private File fotoSeleccionada;
+	
 	private JButton guardarButton;
 	private JButton limpiarButton;
 
@@ -197,6 +211,27 @@ public class CocheCreateView extends View {
 		transmisionCB = new JComboBox<TipoTransmision>();
 		c.gridx = 3;
 		formPanel.add(transmisionCB, c);
+		
+
+y++;
+
+c.gridx = 0;
+c.gridy = y;
+formPanel.add(new JLabel("Fotografía:"), c);
+
+fotoButton = new JButton("Seleccionar imagen");
+c.gridx = 1;
+formPanel.add(fotoButton, c);
+
+fotoPreview = new JLabel("Sin imagen");
+c.gridx = 2;
+c.gridwidth = 2;
+formPanel.add(fotoPreview, c);
+
+c.gridwidth = 1;
+
+fotoButton.addActionListener(e -> seleccionarFoto());
+
 
 		JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		add(botonesPanel, BorderLayout.SOUTH);
@@ -221,6 +256,45 @@ public class CocheCreateView extends View {
 			}
 		});
 	}
+	
+	
+	private void seleccionarFoto() {
+
+    JFileChooser chooser = new JFileChooser();
+
+    chooser.setDialogTitle("Seleccionar imagen del coche");
+
+    chooser.setFileFilter(new FileNameExtensionFilter(
+            "Imágenes JPG y PNG", "jpg", "jpeg", "png"));
+
+    if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+
+        File archivo = chooser.getSelectedFile();
+
+        try {
+            Image imagen = ImageIO.read(archivo);
+
+            if (imagen == null) {
+                throw new Exception("Imagen no válida");
+            }
+
+            fotoSeleccionada = archivo;
+
+            Image escalada = imagen.getScaledInstance(
+                    150, 100, Image.SCALE_SMOOTH);
+
+            fotoPreview.setIcon(new ImageIcon(escalada));
+            fotoPreview.setText("");
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo cargar la imagen.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+
+	
 
 	private void postInitialize() {
 
@@ -420,8 +494,16 @@ public class CocheCreateView extends View {
 		motorCB.setSelectedIndex(0);
 		transmisionCB.setSelectedIndex(0);
 		cocheId = null;
+		fotoSeleccionada = null;
+		fotoPreview.setIcon(null);
+		fotoPreview.setText("Sin imagen");
 	}
 
+	
+	public File getFotoSeleccionada() {
+	    return fotoSeleccionada;
+	}
+	
 	public Coche getModel() {
 
 		String matricula = matriculaTF.getText().trim();
@@ -543,6 +625,7 @@ public class CocheCreateView extends View {
 		combustibleCB.setEnabled(editable);
 		motorCB.setEnabled(editable);
 		transmisionCB.setEnabled(editable);
+		fotoButton.setEnabled(editable);
 	}
 
 	public void setAgreeController(Controller controller) {
